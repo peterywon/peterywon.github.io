@@ -44,15 +44,30 @@
   .links a:hover{border-color:var(--accent); color:var(--accent);}
 
   /* papers */
-  .paper{margin:0 0 30px; padding-left:14px; border-left:2px solid var(--line);}
+  .paper{margin:0 0 26px; padding-left:14px; border-left:2px solid var(--line);}
   .paper h3{color:var(--ink);}
   .paper .authors{color:var(--muted); font-size:.95rem; margin:2px 0 6px; font-family:"Inter",sans-serif;}
-  .paper .venue{font-size:.9rem; color:var(--muted); font-style:italic; margin:6px 0;}
-  .paper .abs{font-size:.96rem; color:#333; margin:8px 0 8px;}
-  .paper .tags{font-family:"Inter",sans-serif; font-size:.82rem;}
-  .paper .tags a{display:inline-block; margin-right:8px; border-bottom:none; color:var(--accent); font-weight:500;}
-  .badge{display:inline-block; font-family:"Inter",sans-serif; font-size:.72rem; text-transform:uppercase;
-    letter-spacing:.06em; background:#f0ece4; color:#6b5b3e; padding:2px 7px; border-radius:4px; vertical-align:middle; margin-left:6px;}
+  .paper .venue{font-size:.88rem; color:var(--muted); font-style:italic; margin:6px 0;}
+  .paper .tags{font-family:"Inter",sans-serif; font-size:.82rem; margin-top:6px;}
+  .paper .tags a{display:inline-block; margin-right:10px; border-bottom:none; color:var(--accent); font-weight:500;}
+
+  /* collapsible abstract */
+  details.abs{margin:8px 0 2px;}
+  details.abs > summary{
+    cursor:pointer; font-family:"Inter",sans-serif; font-size:.82rem; font-weight:600;
+    color:var(--accent); list-style:none; display:inline-block; padding:2px 0;
+    border-bottom:1px dotted rgba(139,26,26,.4);
+  }
+  details.abs > summary::-webkit-details-marker{display:none;}
+  details.abs > summary::before{content:"▸ "; font-size:.7em;}
+  details.abs[open] > summary::before{content:"▾ "; font-size:.7em;}
+  details.abs[open] > summary{margin-bottom:10px;}
+  details.abs .body{font-size:.96rem; color:#333;}
+
+  /* figures inside papers */
+  figure.fig{margin:14px 0 4px; text-align:center;}
+  figure.fig img{max-width:100%; height:auto; border:1px solid var(--line); border-radius:4px; background:#fff;}
+  figure.fig figcaption{font-family:"Inter",sans-serif; font-size:.78rem; color:var(--muted); margin-top:6px;}
 
   /* compact lists */
   ul.tight{list-style:none; padding:0; margin:0;}
@@ -62,10 +77,6 @@
 
   footer{margin-top:64px; padding-top:18px; border-top:1px solid var(--line);
     font-family:"Inter",sans-serif; font-size:.82rem; color:var(--muted);}
-
-  details summary{cursor:pointer; font-family:"Inter",sans-serif; font-size:.82rem; color:var(--accent); list-style:none;}
-  details summary::-webkit-details-marker{display:none;}
-  details[open] summary{margin-bottom:8px;}
 
   @media (max-width:560px){
     body{font-size:16px;}
@@ -78,8 +89,8 @@
 <div class="wrap">
 
   <header>
-    <!-- Put a square headshot named profile.jpg next to this file. Until then it shows a grey circle. -->
-    <img class="photo" src="profile.jpg" alt="Peter Y. Won" onerror="this.style.visibility='hidden'">
+    <!-- Headshot: replace profile.jpg with your own square photo any time. -->
+    <img class="photo" src="profile.jpg" alt="Peter Y. Won" onerror="this.style.display='none'">
     <div class="meta">
       <h1>Peter Y. Won</h1>
       <div class="affil" style="font-size:.95rem;">Youngwoong Won &middot; 원영웅</div>
@@ -111,15 +122,23 @@
   <div class="paper">
     <h3>Commoditize Your Complement: Strategic Open-Source Releases and the Cannibalization of Rival Firms</h3>
     <div class="authors">Peter Y. Won &nbsp;|&nbsp; Job Market Paper</div>
-    <p class="abs">
-      Why do firms release open-source software for free? I show that dominant technology firms strategically
-      release free open-source software (OSS) to commoditize complementary markets and devalue competitors'
-      proprietary assets. Exploiting the staggered release of major GitHub repositories, I find a wealth transfer:
-      focal firms gain 13.9% in market value (over $406&nbsp;billion in aggregate), while exposed rivals fall 7.6%.
-      The strategy forces competitors into technological dependence: they shift human capital toward the focal
-      firm's OSS, cut R&amp;D by 14.8%, curtail exploratory innovation, and exhibit reduced product-market fluidity,
-      even as forced restructuring temporarily inflates their profit margins.
-    </p>
+    <details class="abs">
+      <summary>Abstract</summary>
+      <div class="body">
+        <p>Why do firms release open-source software for free? I show that dominant technology firms strategically
+        release free open-source software (OSS) to commoditize complementary markets and devalue competitors'
+        proprietary assets. Exploiting the staggered release of major GitHub repositories, I find a wealth transfer:
+        focal firms gain 13.9% in market value (over $406&nbsp;billion in aggregate), while exposed rivals fall 7.6%.
+        The strategy forces competitors into technological dependence: they shift human capital toward the focal
+        firm's OSS, cut R&amp;D by 14.8%, curtail exploratory innovation, and exhibit reduced product-market fluidity,
+        even as forced restructuring temporarily inflates their profit margins. Free OSS structurally reorganizes
+        industry competition.</p>
+        <figure class="fig">
+          <img src="fig-oss.png" alt="Dynamic effect on rival sales" onerror="this.closest('figure').style.display='none'">
+          <figcaption>Dynamic effect of a focal OSS release on exposed rivals' sales (event-time DiD).</figcaption>
+        </figure>
+      </div>
+    </details>
     <div class="tags">
       <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6502879" target="_blank" rel="noopener">SSRN</a>
     </div>
@@ -129,14 +148,21 @@
     <h3>(Digital) Platform Data Power</h3>
     <div class="authors">Peter Y. Won</div>
     <p class="venue">Presented at: 2nd HKU Next-Gen Finance PhD Workshop (2026).</p>
-    <p class="abs">
-      How do digital platforms exploit their dual role as marketplace operator and competitor to third-party
-      sellers? I introduce the Data Power Index (DPI), a measure of Amazon's accumulated informational advantage.
-      Unlike the HHI, the DPI shows that tighter data environments compress seller margins and push exposed public
-      firms to cut costs and accelerate innovation, and it robustly predicts the timing and targets of Amazon's
-      private-label entry. After entry, incumbent sellers' profitability falls sharply and exposed firms face
-      heightened risk. Aggregate consumer surplus expands but is reallocated away from incumbent sellers.
-    </p>
+    <details class="abs">
+      <summary>Abstract</summary>
+      <div class="body">
+        <p>How do digital platforms exploit their dual role as marketplace operator and competitor to third-party
+        sellers? I introduce the Data Power Index (DPI), a measure of Amazon's accumulated informational advantage.
+        Unlike the HHI, the DPI shows that tighter data environments compress seller margins and push exposed public
+        firms to cut costs and accelerate innovation, and it robustly predicts the timing and targets of Amazon's
+        private-label entry. After entry, incumbent sellers' profitability falls sharply and exposed firms face
+        heightened risk. Aggregate consumer surplus expands but is reallocated away from incumbent sellers.</p>
+        <figure class="fig">
+          <img src="fig-dpi.jpg" alt="CAR event study around Amazon private-label entry" onerror="this.closest('figure').style.display='none'">
+          <figcaption>Cumulative abnormal returns of exposed incumbents around Amazon's private-label entry.</figcaption>
+        </figure>
+      </div>
+    </details>
     <div class="tags">
       <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5756562" target="_blank" rel="noopener">SSRN</a>
     </div>
@@ -146,14 +172,21 @@
     <h3>Short-Term Lending and Usury Limits: Consumer Impact and Market Adaptation</h3>
     <div class="authors">Marc Jansen, Lawrence Zack, Ryan Voges, and Peter Y. Won</div>
     <p class="venue">Presented at: FIRS Conference (2025), IBEFA / WEAI 99th Annual Conference (2025), Wasatch Finance Conference (2024).</p>
-    <p class="abs">
-      Using borrower-level data on more than 2.8&nbsp;million auto-loan applicants, we study how usury laws affect
-      use of alternative financial services (AFS) such as payday lending, and the spillover to traditional credit.
-      Interest-rate caps significantly reduce AFS use, especially for low-credit borrowers, and many consumers
-      switch between AFS modes (e.g., storefront to online) when credit supply is restricted. These restrictions
-      are correlated with declines in credit scores that limit access to traditional credit, suggesting more
-      targeted regulation may serve underserved consumers better than one-size-fits-all rules.
-    </p>
+    <details class="abs">
+      <summary>Abstract</summary>
+      <div class="body">
+        <p>Using borrower-level data on more than 2.8&nbsp;million auto-loan applicants, we study how usury laws affect
+        use of alternative financial services (AFS) such as payday lending, and the spillover to traditional credit.
+        Interest-rate caps significantly reduce AFS use, especially for low-credit borrowers, and many consumers
+        switch between AFS modes (e.g., storefront to online) when credit supply is restricted. These restrictions
+        are correlated with declines in credit scores that limit access to traditional credit, suggesting more
+        targeted regulation may serve underserved consumers better than one-size-fits-all rules.</p>
+        <figure class="fig">
+          <img src="fig-payday.jpg" alt="" onerror="this.closest('figure').style.display='none'">
+          <figcaption></figcaption>
+        </figure>
+      </div>
+    </details>
     <div class="tags">
       <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5025579" target="_blank" rel="noopener">SSRN</a>
     </div>
@@ -163,14 +196,21 @@
     <h3>Does 0DTE Options Trading Increase Volatility?</h3>
     <div class="authors">Jonathan Brogaard, Jaehee Han, and Peter Y. Won</div>
     <p class="venue">Presented at: China International Conference in Finance (CICF 2026), 13th Annual Conference on Financial Market Regulation (CFMR 2026). &nbsp;Media: Bloomberg, "Zero-Day Options Are Reordering the Way the Stock Market Behaves" (2023).</p>
-    <p class="abs">
-      Monthly trading volume of index-linked zero-days-to-expiration (0DTE) options rose from 0.08&nbsp;million
-      contracts in January 2011 to 34.4&nbsp;million in August 2023, now ~48% of index-options trading. Using the
-      staggered introduction of index weekly options as an instrument, a one-standard-deviation increase in 0DTE
-      trading raises volatility by 9.10% of its mean (15.91% of its standard deviation). Even after controlling for
-      market makers' gamma hedging, the effect on volatility remains positive and is driven primarily by speculative
-      retail investors.
-    </p>
+    <details class="abs">
+      <summary>Abstract</summary>
+      <div class="body">
+        <p>Monthly trading volume of index-linked zero-days-to-expiration (0DTE) options rose from 0.08&nbsp;million
+        contracts in January 2011 to 34.4&nbsp;million in August 2023, now ~48% of index-options trading. Using the
+        staggered introduction of index weekly options as an instrument, a one-standard-deviation increase in 0DTE
+        trading raises volatility by 9.10% of its mean (15.91% of its standard deviation). Even after controlling for
+        market makers' gamma hedging, the effect on volatility remains positive and is driven primarily by speculative
+        retail investors.</p>
+        <figure class="fig">
+          <img src="fig-0dte.jpg" alt="Growth of 0DTE options trading volume" onerror="this.closest('figure').style.display='none'">
+          <figcaption>Monthly trading volume of index-linked 0DTE options, 2011–2023.</figcaption>
+        </figure>
+      </div>
+    </details>
     <div class="tags">
       <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4426358" target="_blank" rel="noopener">SSRN</a>
     </div>
@@ -182,11 +222,12 @@
     <h3>Cyclical Consumption and Expected Stock Returns: Evidence from the Korean Capital Market</h3>
     <div class="authors">Youngwoong Won, Chaehwan Won, and Yangkyu Won &nbsp;<span class="yr">2021</span></div>
     <p class="venue">Global Business &amp; Finance Review (GBFR), 26(3), 14–32.</p>
-    <p class="abs">
-      We show that a new "cyclical consumption" variable captures consumption risk and predicts expected stock
+    <details class="abs">
+      <summary>Abstract</summary>
+      <div class="body"><p>We show that a new "cyclical consumption" variable captures consumption risk and predicts expected stock
       returns, and document where the relation is stronger across KOSPI vs. KOSDAQ and across industries in the
-      Korean capital market.
-    </p>
+      Korean capital market.</p></div>
+    </details>
     <div class="tags">
       <a href="https://www.econstor.eu/handle/10419/253330" target="_blank" rel="noopener">Link</a>
     </div>
@@ -196,11 +237,12 @@
     <h3>Determinants of the Prices and Returns of Preferred Stocks</h3>
     <div class="authors">Sehyun Kim, Chaehwan Won, and Youngwoong Won &nbsp;<span class="yr">2020</span></div>
     <p class="venue">Asia-Pacific Journal of Business, 11(2), 159–172.</p>
-    <p class="abs">
-      We identify the economic variables that affect prices and returns of preferred stocks. Significant drivers
+    <details class="abs">
+      <summary>Abstract</summary>
+      <div class="body"><p>We identify the economic variables that affect prices and returns of preferred stocks. Significant drivers
       include the consumer sentiment index, CPI, industrial production index, KOSPI volatility index, and the
-      KRW/USD exchange rate.
-    </p>
+      KRW/USD exchange rate.</p></div>
+    </details>
     <div class="tags">
       <a href="https://koreascience.kr/article/JAKO202012461863296.page" target="_blank" rel="noopener">Link</a>
     </div>
