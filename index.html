@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Peter Y. Won (Youngwoong Won)</title>
+<meta name="description" content="Peter Y. Won — Ph.D. Candidate in Finance, David Eccles School of Business, University of Utah. Research on corporate finance, intangible assets, digital platforms, and consumer finance.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1c1c1c; --muted:#5c5c5c; --line:#e3e3e3; --accent:#8b1a1a; --bg:#fdfdfc;
+    --maxw:760px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Source Serif 4", Georgia, serif; font-size:18px; line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:60px 24px 80px;}
+  a{color:var(--accent); text-decoration:none; border-bottom:1px solid rgba(139,26,26,.25);}
+  a:hover{border-bottom-color:var(--accent);}
+  h1,h2,h3{font-family:"Source Serif 4", Georgia, serif; line-height:1.25; font-weight:700;}
+  h1{font-size:2rem; margin:0 0 4px;}
+  h2{font-size:1.18rem; text-transform:uppercase; letter-spacing:.08em; font-weight:600;
+     margin:54px 0 18px; padding-bottom:6px; border-bottom:1px solid var(--line);}
+  h3{font-size:1.08rem; margin:0 0 4px; font-weight:600;}
+  p{margin:0 0 16px;}
+  .lede{color:var(--muted); font-size:1.05rem;}
+
+  /* header */
+  header{display:flex; gap:28px; align-items:flex-start; flex-wrap:wrap;}
+  header .photo{
+    width:140px; height:140px; border-radius:50%; object-fit:cover; flex:0 0 auto;
+    background:#ececec; border:1px solid var(--line);
+  }
+  header .meta{flex:1 1 320px; min-width:280px;}
+  .affil{color:var(--muted); margin:2px 0; font-size:1rem;}
+  .links{font-family:"Inter",system-ui,sans-serif; font-size:.9rem; margin-top:14px; line-height:2;}
+  .links a{border:1px solid var(--line); border-radius:6px; padding:4px 10px; margin-right:6px; white-space:nowrap; color:var(--ink);}
+  .links a:hover{border-color:var(--accent); color:var(--accent);}
+
+  /* papers */
+  .paper{margin:0 0 30px; padding-left:14px; border-left:2px solid var(--line);}
+  .paper h3{color:var(--ink);}
+  .paper .authors{color:var(--muted); font-size:.95rem; margin:2px 0 6px; font-family:"Inter",sans-serif;}
+  .paper .venue{font-size:.9rem; color:var(--muted); font-style:italic; margin:6px 0;}
+  .paper .abs{font-size:.96rem; color:#333; margin:8px 0 8px;}
+  .paper .tags{font-family:"Inter",sans-serif; font-size:.82rem;}
+  .paper .tags a{display:inline-block; margin-right:8px; border-bottom:none; color:var(--accent); font-weight:500;}
+  .badge{display:inline-block; font-family:"Inter",sans-serif; font-size:.72rem; text-transform:uppercase;
+    letter-spacing:.06em; background:#f0ece4; color:#6b5b3e; padding:2px 7px; border-radius:4px; vertical-align:middle; margin-left:6px;}
+
+  /* compact lists */
+  ul.tight{list-style:none; padding:0; margin:0;}
+  ul.tight li{margin:0 0 10px; padding-left:18px; position:relative;}
+  ul.tight li::before{content:"›"; position:absolute; left:0; color:var(--accent);}
+  .yr{font-family:"Inter",sans-serif; color:var(--muted); font-size:.85rem;}
+
+  footer{margin-top:64px; padding-top:18px; border-top:1px solid var(--line);
+    font-family:"Inter",sans-serif; font-size:.82rem; color:var(--muted);}
+
+  details summary{cursor:pointer; font-family:"Inter",sans-serif; font-size:.82rem; color:var(--accent); list-style:none;}
+  details summary::-webkit-details-marker{display:none;}
+  details[open] summary{margin-bottom:8px;}
+
+  @media (max-width:560px){
+    body{font-size:16px;}
+    header .photo{width:104px; height:104px;}
+    h1{font-size:1.6rem;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <!-- Put a square headshot named profile.jpg next to this file. Until then it shows a grey circle. -->
+    <img class="photo" src="profile.jpg" alt="Peter Y. Won" onerror="this.style.visibility='hidden'">
+    <div class="meta">
+      <h1>Peter Y. Won</h1>
+      <div class="affil" style="font-size:.95rem;">Youngwoong Won &middot; 원영웅</div>
+      <p class="affil">Ph.D. Candidate in Finance</p>
+      <p class="affil">David Eccles School of Business, University of Utah</p>
+      <div class="links">
+        <a href="mailto:peter.young.won@eccles.utah.edu">Email</a>
+        <a href="https://eccles.utah.edu/team/peter-young-won/" target="_blank" rel="noopener">School profile</a>
+        <a href="https://www.linkedin.com/in/peteryoungphd21" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://papers.ssrn.com/sol3/cf_dev/AbsByAuth.cfm" target="_blank" rel="noopener">SSRN</a>
+        <a href="#" target="_blank" rel="noopener">Google&nbsp;Scholar</a>
+        <a href="Peter_Won_CV.pdf" target="_blank" rel="noopener">CV&nbsp;(PDF)</a>
+      </div>
+    </div>
+  </header>
+
+  <section>
+    <p class="lede" style="margin-top:34px;">
+      I am a Ph.D. candidate in Finance at the University of Utah. My research is in empirical
+      corporate finance, with a focus on intangible assets, digital platforms, open-source
+      software as competitive strategy, and consumer finance. I use large-scale archival data
+      and quasi-natural experiments to study how dominant technology firms reshape product-market
+      competition and how regulation affects underserved consumers.
+    </p>
+  </section>
+
+  <h2>Working Papers</h2>
+
+  <div class="paper">
+    <h3>Commoditize Your Complement: Strategic Open-Source Releases and the Cannibalization of Rival Firms</h3>
+    <div class="authors">Peter Y. Won &nbsp;|&nbsp; Job Market Paper</div>
+    <p class="abs">
+      Why do firms release open-source software for free? I show that dominant technology firms strategically
+      release free open-source software (OSS) to commoditize complementary markets and devalue competitors'
+      proprietary assets. Exploiting the staggered release of major GitHub repositories, I find a wealth transfer:
+      focal firms gain 13.9% in market value (over $406&nbsp;billion in aggregate), while exposed rivals fall 7.6%.
+      The strategy forces competitors into technological dependence: they shift human capital toward the focal
+      firm's OSS, cut R&amp;D by 14.8%, curtail exploratory innovation, and exhibit reduced product-market fluidity,
+      even as forced restructuring temporarily inflates their profit margins.
+    </p>
+    <div class="tags">
+      <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6502879" target="_blank" rel="noopener">SSRN</a>
+    </div>
+  </div>
+
+  <div class="paper">
+    <h3>(Digital) Platform Data Power</h3>
+    <div class="authors">Peter Y. Won</div>
+    <p class="venue">Presented at: 2nd HKU Next-Gen Finance PhD Workshop (2026).</p>
+    <p class="abs">
+      How do digital platforms exploit their dual role as marketplace operator and competitor to third-party
+      sellers? I introduce the Data Power Index (DPI), a measure of Amazon's accumulated informational advantage.
+      Unlike the HHI, the DPI shows that tighter data environments compress seller margins and push exposed public
+      firms to cut costs and accelerate innovation, and it robustly predicts the timing and targets of Amazon's
+      private-label entry. After entry, incumbent sellers' profitability falls sharply and exposed firms face
+      heightened risk. Aggregate consumer surplus expands but is reallocated away from incumbent sellers.
+    </p>
+    <div class="tags">
+      <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5756562" target="_blank" rel="noopener">SSRN</a>
+    </div>
+  </div>
+
+  <div class="paper">
+    <h3>Short-Term Lending and Usury Limits: Consumer Impact and Market Adaptation</h3>
+    <div class="authors">Marc Jansen, Lawrence Zack, Ryan Voges, and Peter Y. Won</div>
+    <p class="venue">Presented at: FIRS Conference (2025), IBEFA / WEAI 99th Annual Conference (2025), Wasatch Finance Conference (2024).</p>
+    <p class="abs">
+      Using borrower-level data on more than 2.8&nbsp;million auto-loan applicants, we study how usury laws affect
+      use of alternative financial services (AFS) such as payday lending, and the spillover to traditional credit.
+      Interest-rate caps significantly reduce AFS use, especially for low-credit borrowers, and many consumers
+      switch between AFS modes (e.g., storefront to online) when credit supply is restricted. These restrictions
+      are correlated with declines in credit scores that limit access to traditional credit, suggesting more
+      targeted regulation may serve underserved consumers better than one-size-fits-all rules.
+    </p>
+    <div class="tags">
+      <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5025579" target="_blank" rel="noopener">SSRN</a>
+    </div>
+  </div>
+
+  <div class="paper">
+    <h3>Does 0DTE Options Trading Increase Volatility?</h3>
+    <div class="authors">Jonathan Brogaard, Jaehee Han, and Peter Y. Won</div>
+    <p class="venue">Presented at: China International Conference in Finance (CICF 2026), 13th Annual Conference on Financial Market Regulation (CFMR 2026). &nbsp;Media: Bloomberg, "Zero-Day Options Are Reordering the Way the Stock Market Behaves" (2023).</p>
+    <p class="abs">
+      Monthly trading volume of index-linked zero-days-to-expiration (0DTE) options rose from 0.08&nbsp;million
+      contracts in January 2011 to 34.4&nbsp;million in August 2023, now ~48% of index-options trading. Using the
+      staggered introduction of index weekly options as an instrument, a one-standard-deviation increase in 0DTE
+      trading raises volatility by 9.10% of its mean (15.91% of its standard deviation). Even after controlling for
+      market makers' gamma hedging, the effect on volatility remains positive and is driven primarily by speculative
+      retail investors.
+    </p>
+    <div class="tags">
+      <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4426358" target="_blank" rel="noopener">SSRN</a>
+    </div>
+  </div>
+
+  <h2>Publications</h2>
+
+  <div class="paper">
+    <h3>Cyclical Consumption and Expected Stock Returns: Evidence from the Korean Capital Market</h3>
+    <div class="authors">Youngwoong Won, Chaehwan Won, and Yangkyu Won &nbsp;<span class="yr">2021</span></div>
+    <p class="venue">Global Business &amp; Finance Review (GBFR), 26(3), 14–32.</p>
+    <p class="abs">
+      We show that a new "cyclical consumption" variable captures consumption risk and predicts expected stock
+      returns, and document where the relation is stronger across KOSPI vs. KOSDAQ and across industries in the
+      Korean capital market.
+    </p>
+    <div class="tags">
+      <a href="https://www.econstor.eu/handle/10419/253330" target="_blank" rel="noopener">Link</a>
+    </div>
+  </div>
+
+  <div class="paper">
+    <h3>Determinants of the Prices and Returns of Preferred Stocks</h3>
+    <div class="authors">Sehyun Kim, Chaehwan Won, and Youngwoong Won &nbsp;<span class="yr">2020</span></div>
+    <p class="venue">Asia-Pacific Journal of Business, 11(2), 159–172.</p>
+    <p class="abs">
+      We identify the economic variables that affect prices and returns of preferred stocks. Significant drivers
+      include the consumer sentiment index, CPI, industrial production index, KOSPI volatility index, and the
+      KRW/USD exchange rate.
+    </p>
+    <div class="tags">
+      <a href="https://koreascience.kr/article/JAKO202012461863296.page" target="_blank" rel="noopener">Link</a>
+    </div>
+  </div>
+
+  <h2>Education</h2>
+  <ul class="tight">
+    <li><strong>University of Utah</strong> — Ph.D., Finance <span class="yr">2022 – present</span><br>
+        <span class="yr">Fields: corporate finance, intangible assets, digital platforms, consumer finance</span></li>
+    <li><strong>Seoul National University</strong> — M.S., Finance <span class="yr">2019 – 2021</span></li>
+    <li><strong>University of Seoul</strong> — B.A., Business Administration <span class="yr">2013 – 2019</span></li>
+  </ul>
+
+  <h2>Honors &amp; Grants</h2>
+  <ul class="tight">
+    <li>Dewey Research Data Grant ($7,200) <span class="yr">2024</span></li>
+    <li>University of Utah, MSE Rising Scholar Award <span class="yr">2022</span></li>
+    <li>Seoul National University, Business School TA/RA Scholarship <span class="yr">2019 – 2021</span></li>
+    <li>University of Seoul, Summa Cum Laude (Seoul Mayor) <span class="yr">2018</span></li>
+    <li>Maeil Economy Newspaper economics thesis contest, 3rd place <span class="yr">2021</span></li>
+  </ul>
+
+  <h2>Skills</h2>
+  <p>SAS, Stata, R, Python, MATLAB. Fluent in English and Korean (dual citizen).</p>
+
+  <h2>Contact</h2>
+  <p>
+    Department of Finance, David Eccles School of Business<br>
+    University of Utah, Salt Lake City, UT<br>
+    <a href="mailto:peter.young.won@eccles.utah.edu">peter.young.won@eccles.utah.edu</a> &nbsp;·&nbsp;
+    <a href="mailto:u1414506@utah.edu">u1414506@utah.edu</a>
+  </p>
+
+  <footer>
+    Last updated May 2026. &nbsp;Built as a single static page hosted on GitHub Pages.
+  </footer>
+
+</div>
+</body>
+</html>
