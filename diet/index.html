@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Diet">
+<title>Diet Tracker</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🥗%3C/text%3E%3C/svg%3E">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #fafafa;
+    --card: #ffffff;
+    --primary: #0ea5e9;
+    --primary-dark: #0284c7;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --carbs: #f59e0b;
+    --protein: #ef4444;
+    --fat: #8b5cf6;
+    --radius: 12px;
+  }
+  html, body {
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #app {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 12px 80px;
+  }
+  header {
+    padding: 16px 4px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  h1 { font-size: 20px; font-weight: 700; }
+  h1 .emoji { margin-right: 6px; }
+  h2 { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
+  h3 { font-size: 14px; font-weight: 600; color: var(--muted); margin-bottom: 8px; }
+  .date-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 4px 4px;
+    gap: 8px;
+  }
+  .date-nav button {
+    padding: 4px 10px;
+    font-size: 18px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .date-display {
+    font-weight: 600;
+    font-size: 16px;
+    flex: 1;
+    text-align: center;
+    color: var(--text);
+  }
+  .date-display.today { color: var(--primary); }
+  .tabs {
+    display: flex;
+    gap: 4px;
+    padding: 8px 0;
+    overflow-x: auto;
+  }
+  .tab-btn {
+    padding: 8px 14px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .tab-btn.active {
+    background: var(--primary);
+    color: white;
+  }
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+    border: 1px solid var(--border);
+  }
+  .hidden { display: none !important; }
+  button.btn {
+    padding: 10px 16px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  button.btn:hover { background: var(--primary-dark); }
+  button.btn:disabled { background: var(--muted); cursor: not-allowed; }
+  button.btn-secondary {
+    background: transparent;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+  }
+  button.btn-secondary:hover { background: rgba(14, 165, 233, 0.05); }
+  button.btn-danger {
+    background: var(--danger);
+  }
+  button.btn-danger:hover { background: #dc2626; }
+  input, select, textarea {
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    background: white;
+    width: 100%;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+  }
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .form-row {
+    margin-bottom: 12px;
+  }
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .mode-toggle {
+    display: flex;
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 4px;
+    margin-bottom: 12px;
+  }
+  .mode-toggle button {
+    flex: 1;
+    padding: 8px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .mode-toggle button.active {
+    background: white;
+    color: var(--text);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .input-row {
+    display: flex;
+    gap: 8px;
+  }
+  .input-row input { flex: 1; }
+  .photo-preview {
+    width: 100%;
+    max-height: 250px;
+    object-fit: contain;
+    border-radius: 8px;
+    margin-top: 8px;
+    background: var(--bg);
+  }
+  .preview-card {
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 12px;
+  }
+  .preview-card .name {
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+  .preview-card .amount {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .preview-card .macros {
+    display: flex;
+    gap: 12px;
+    font-size: 13px;
+  }
+  .preview-card .macros span { font-weight: 500; }
+  .preview-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-label { font-size: 13px; color: var(--muted); }
+  .stat-value { font-size: 15px; font-weight: 600; }
+  .stat-big {
+    text-align: center;
+    padding: 8px 0;
+  }
+  .stat-big .num {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--primary);
+  }
+  .stat-big .num.over { color: var(--danger); }
+  .stat-big .num.under { color: var(--warning); }
+  .stat-big .num.ontarget { color: var(--success); }
+  .stat-big .unit {
+    font-size: 14px;
+    color: var(--muted);
+    margin-left: 4px;
+  }
+  .stat-big .sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .progress-bar {
+    height: 8px;
+    background: var(--bg);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+  .progress-bar .fill {
+    height: 100%;
+    background: var(--primary);
+    transition: width 0.3s;
+  }
+  .progress-bar .fill.over { background: var(--danger); }
+  .progress-bar .fill.ontarget { background: var(--success); }
+  .macros-bar {
+    display: flex;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 12px 0;
+  }
+  .macros-bar > div { transition: width 0.3s; }
+  .macros-legend {
+    display: flex;
+    justify-content: space-around;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .macros-legend .dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+  .pie-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .pie-container svg { flex-shrink: 0; }
+  .pie-legend { flex: 1; min-width: 160px; }
+  .pie-legend .legend-item {
+    display: flex;
+    align-items: center;
+    padding: 4px 0;
+    font-size: 13px;
+  }
+  .pie-legend .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    margin-right: 8px;
+    flex-shrink: 0;
+  }
+  .empty-chart {
+    color: var(--muted);
+    font-size: 13px;
+    padding: 20px;
+    text-align: center;
+  }
+  .entry-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .entry-item:last-child { border-bottom: none; }
+  .entry-item .info { flex: 1; }
+  .entry-item .time {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 2px;
+  }
+  .entry-item .name {
+    font-weight: 500;
+    font-size: 14px;
+  }
+  .entry-item .macros {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .entry-item .kcal {
+    font-weight: 600;
+    color: var(--primary);
+    margin-left: 12px;
+  }
+  .entry-item .delete-btn {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0 4px;
+    margin-left: 8px;
+  }
+  .entry-item .delete-btn:hover { color: var(--danger); }
+  .empty-list {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    padding: 20px 0;
+  }
+  .calendar-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .calendar-nav .month-label {
+    font-weight: 600;
+    font-size: 16px;
+  }
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+  .calendar-grid .day-label {
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 600;
+    padding: 4px 0;
+  }
+  .calendar-cell {
+    aspect-ratio: 1;
+    background: var(--bg);
+    border-radius: 6px;
+    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.15s;
+  }
+  .calendar-cell:hover { border-color: var(--primary); }
+  .calendar-cell.today { border-color: var(--primary); }
+  .calendar-cell.other-month { opacity: 0.3; }
+  .calendar-cell .cal-date {
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .calendar-cell .cal-kcal {
+    font-size: 10px;
+    color: var(--muted);
+    text-align: right;
+  }
+  .calendar-cell.ontarget { background: #d1fae5; }
+  .calendar-cell.under { background: #fef3c7; }
+  .calendar-cell.over { background: #fee2e2; }
+  .goal-result {
+    background: #f0f9ff;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 12px;
+  }
+  .goal-result .big-num {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary);
+    text-align: center;
+    padding: 8px 0;
+  }
+  .goal-result .note {
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 4px;
+  }
+  #toast {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    border-radius: 8px;
+    background: #1f2937;
+    color: white;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    z-index: 100;
+    display: none;
+    max-width: 90vw;
+  }
+  #toast.error { background: var(--danger); }
+  #toast.success { background: var(--success); }
+  .setup-banner {
+    background: #fef3c7;
+    border: 1px solid #fbbf24;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: #92400e;
+  }
+  .setup-banner b { display: block; margin-bottom: 4px; }
+  .loader {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .sync-status {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .help-text {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1><span class="emoji">🥗</span>Diet Tracker</h1>
+    <span class="sync-status" id="sync-status">–</span>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="today">오늘</button>
+    <button class="tab-btn" data-tab="calendar">캘린더</button>
+    <button class="tab-btn" data-tab="goal">목표</button>
+    <button class="tab-btn" data-tab="settings">설정</button>
+  </div>
+
+  <section id="tab-today" class="tab-content"></section>
+  <section id="tab-calendar" class="tab-content hidden"></section>
+  <section id="tab-goal" class="tab-content hidden"></section>
+  <section id="tab-settings" class="tab-content hidden"></section>
+</div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+// ---------- Constants ----------
+const STORAGE_KEY = 'diet_tracker_v1';
+const GEMINI_MODEL = 'gemini-2.0-flash';
+const ACTIVITY_FACTORS = {
+  sedentary: 1.2, light: 1.375, moderate: 1.55, active: 1.725, very_active: 1.9
+};
+const ACTIVITY_LABELS = {
+  sedentary: '거의 안 움직임 (책상 위주)',
+  light: '가벼운 운동 (주 1-3회)',
+  moderate: '보통 운동 (주 3-5회)',
+  active: '활발한 운동 (주 6-7회)',
+  very_active: '매우 활발 (선수 수준)'
+};
+const KCAL_PER_KG_FAT = 7700;
+
+// ---------- State ----------
+let state = {
+  settings: { pat: '', gistId: '', geminiKey: '' },
+  data: {
+    profile: {
+      gender: 'male', age: 30, height_cm: 175,
+      currentKg: 75, goalKg: 70, targetDays: 60,
+      activity: 'light',
+      carbsPct: 40, proteinPct: 30, fatPct: 30
+    },
+    entries: {}
+  },
+  currentDate: new Date().toISOString().slice(0, 10),
+  calendarMonth: new Date().toISOString().slice(0, 7),
+  currentTab: 'today',
+  inputMode: 'text',
+  pendingFood: null,
+  pendingPhotoBase64: null,
+  pendingPhotoMime: null
+};
+
+// ---------- Storage ----------
+function loadState() {
+  const cached = localStorage.getItem(STORAGE_KEY);
+  if (cached) {
+    try {
+      const parsed = JSON.parse(cached);
+      if (parsed.settings) state.settings = { ...state.settings, ...parsed.settings };
+      if (parsed.data) {
+        state.data.profile = { ...state.data.profile, ...(parsed.data.profile || {}) };
+        state.data.entries = parsed.data.entries || {};
+      }
+    } catch (e) { console.error('loadState:', e); }
+  }
+}
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    settings: state.settings,
+    data: state.data
+  }));
+}
+
+// ---------- Gist Sync ----------
+async function syncFromGist(silent = false) {
+  if (!state.settings.pat || !state.settings.gistId) {
+    if (!silent) toast('PAT 또는 Gist ID가 없음', 'error');
+    return false;
+  }
+  try {
+    setSyncStatus('↓ pulling...');
+    const res = await fetch(`https://api.github.com/gists/${state.settings.gistId}`, {
+      headers: { Authorization: `token ${state.settings.pat}` }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const gist = await res.json();
+    const file = gist.files['diet.json'];
+    if (!file) {
+      // First time: gist exists but diet.json empty; treat as fresh
+      setSyncStatus('✓ empty gist');
+      if (!silent) toast('Gist에 diet.json 없음 — 첫 저장 시 생성됩니다', 'info');
+      return true;
+    }
+    const remote = JSON.parse(file.content || '{}');
+    if (remote.profile) state.data.profile = { ...state.data.profile, ...remote.profile };
+    if (remote.entries) state.data.entries = remote.entries;
+    saveState();
+    setSyncStatus('✓ synced ' + new Date().toLocaleTimeString('ko-KR', {hour:'2-digit',minute:'2-digit'}));
+    if (!silent) toast('Gist에서 불러옴', 'success');
+    return true;
+  } catch (e) {
+    setSyncStatus('✗ ' + e.message);
+    if (!silent) toast('Sync 실패: ' + e.message, 'error');
+    return false;
+  }
+}
+
+async function syncToGist(silent = false) {
+  if (!state.settings.pat || !state.settings.gistId) {
+    if (!silent) toast('PAT 또는 Gist ID가 없음', 'error');
+    return false;
+  }
+  try {
+    setSyncStatus('↑ pushing...');
+    const res = await fetch(`https://api.github.com/gists/${state.settings.gistId}`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `token ${state.settings.pat}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        files: {
+          'diet.json': { content: JSON.stringify(state.data, null, 2) }
+        }
+      })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    setSyncStatus('✓ synced ' + new Date().toLocaleTimeString('ko-KR', {hour:'2-digit',minute:'2-digit'}));
+    return true;
+  } catch (e) {
+    setSyncStatus('✗ ' + e.message);
+    if (!silent) toast('저장 실패: ' + e.message, 'error');
+    return false;
+  }
+}
+
+function setSyncStatus(text) {
+  document.getElementById('sync-status').textContent = text;
+}
+
+// ---------- Gemini API ----------
+async function analyzeFoodText(text) {
+  if (!state.settings.geminiKey) throw new Error('Gemini API 키가 설정되지 않음');
+  const prompt = `당신은 한국·서양 음식의 영양 성분 추정 전문가입니다.
+사용자 입력: "${text}"
+
+이 음식/양의 영양성분을 추정하고, 정확히 아래 JSON 스키마로만 응답하세요:
+{
+  "name": "음식 이름 (한글 우선)",
+  "amount": "양 (예: '200g', '1인분', '1공기')",
+  "kcal": 정수 칼로리,
+  "carbs_g": 정수 탄수화물(g),
+  "protein_g": 정수 단백질(g),
+  "fat_g": 정수 지방(g),
+  "confidence": "high" | "medium" | "low"
+}
+한국인 표준 1인분/1공기 기준으로 현실적으로 추정. 마크다운 없이 JSON만.`;
+
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(state.settings.geminiKey)}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          responseMimeType: 'application/json',
+          temperature: 0.2
+        }
+      })
+    }
+  );
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Gemini ${res.status}: ${err.slice(0, 150)}`);
+  }
+  const data = await res.json();
+  const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!content) throw new Error('Gemini 응답 없음');
+  return JSON.parse(content);
+}
+
+async function analyzeFoodPhoto(base64, mimeType) {
+  if (!state.settings.geminiKey) throw new Error('Gemini API 키가 설정되지 않음');
+  const prompt = `당신은 사진 속 음식의 영양 성분 추정 전문가입니다.
+이 사진의 음식을 분석하고, 정확히 아래 JSON 스키마로만 응답하세요:
+{
+  "name": "음식 이름 (한글 우선)",
+  "amount": "사진에서 추정한 양 (예: '1인분', '1공기', '약 200g')",
+  "kcal": 정수 칼로리,
+  "carbs_g": 정수 탄수화물(g),
+  "protein_g": 정수 단백질(g),
+  "fat_g": 정수 지방(g),
+  "confidence": "high" | "medium" | "low"
+}
+여러 음식이 있으면 합산. 접시 크기/그릇 참고. 마크다운 없이 JSON만.`;
+
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(state.settings.geminiKey)}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            { text: prompt },
+            { inline_data: { mime_type: mimeType, data: base64 } }
+          ]
+        }],
+        generationConfig: {
+          responseMimeType: 'application/json',
+          temperature: 0.2
+        }
+      })
+    }
+  );
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Gemini ${res.status}: ${err.slice(0, 150)}`);
+  }
+  const data = await res.json();
+  const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!content) throw new Error('Gemini 응답 없음');
+  return JSON.parse(content);
+}
+
+// ---------- Nutrition Math ----------
+function calculateBMR(profile) {
+  const { gender, age, height_cm, currentKg } = profile;
+  const base = 10 * currentKg + 6.25 * height_cm - 5 * age;
+  return gender === 'male' ? base + 5 : base - 161;
+}
+function calculateMaintenance(profile) {
+  return calculateBMR(profile) * (ACTIVITY_FACTORS[profile.activity] || 1.2);
+}
+function calculateRecommendation(profile) {
+  const maintenance = calculateMaintenance(profile);
+  const kgToLose = profile.currentKg - profile.goalKg;
+  if (kgToLose <= 0) {
+    return { maintenance, recommended: Math.round(maintenance), note: '유지 또는 벌크 모드', bmr: calculateBMR(profile), kgToLose };
+  }
+  const totalDeficit = kgToLose * KCAL_PER_KG_FAT;
+  const dailyDeficit = totalDeficit / profile.targetDays;
+  let recommended = maintenance - dailyDeficit;
+  const minSafe = profile.gender === 'male' ? 1500 : 1200;
+  let note = `일일 부족: ${Math.round(dailyDeficit)} kcal (주 감량 ${(kgToLose / profile.targetDays * 7).toFixed(2)}kg)`;
+  if (recommended < minSafe) {
+    const adjustedDays = Math.ceil(totalDeficit / (maintenance - minSafe));
+    recommended = minSafe;
+    note = `⚠ 안전 최소값(${minSafe})으로 조정. 목표 달성 예상: ${adjustedDays}일`;
+  }
+  return { maintenance: Math.round(maintenance), recommended: Math.round(recommended), note, bmr: Math.round(calculateBMR(profile)), kgToLose };
+}
+function getDailyTotals(date) {
+  const entries = state.data.entries[date] || [];
+  let kcal = 0, carbs = 0, protein = 0, fat = 0;
+  entries.forEach(e => {
+    kcal += Number(e.kcal || 0);
+    carbs += Number(e.carbs_g || 0);
+    protein += Number(e.protein_g || 0);
+    fat += Number(e.fat_g || 0);
+  });
+  return { kcal: Math.round(kcal), carbs: Math.round(carbs), protein: Math.round(protein), fat: Math.round(fat), count: entries.length };
+}
+
+// ---------- Utils ----------
+function fmtDate(d) {
+  const dt = new Date(d);
+  const weekdays = ['일','월','화','수','목','금','토'];
+  return `${dt.getFullYear()}. ${dt.getMonth()+1}. ${dt.getDate()}. (${weekdays[dt.getDay()]})`;
+}
+function isToday(d) { return d === new Date().toISOString().slice(0, 10); }
+function shiftDate(d, days) {
+  const dt = new Date(d + 'T12:00:00');
+  dt.setDate(dt.getDate() + days);
+  return dt.toISOString().slice(0, 10);
+}
+function toast(msg, kind = 'info') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = kind;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 3000);
+}
+function el(html) {
+  const d = document.createElement('div');
+  d.innerHTML = html.trim();
+  return d.firstElementChild;
+}
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ---------- Pie Chart ----------
+function drawPieChart(container, carbs, protein, fat) {
+  const weights = [carbs * 4, protein * 4, fat * 9]; // kcal
+  const total = weights.reduce((a, b) => a + b, 0);
+  const colors = [getComputedStyle(document.documentElement).getPropertyValue('--carbs').trim(),
+                  getComputedStyle(document.documentElement).getPropertyValue('--protein').trim(),
+                  getComputedStyle(document.documentElement).getPropertyValue('--fat').trim()];
+  const labels = ['탄수화물', '단백질', '지방'];
+  const grams = [carbs, protein, fat];
+  if (total === 0) {
+    container.innerHTML = '<div class="empty-chart">아직 데이터 없음</div>';
+    return;
+  }
+  const size = 160;
+  const cx = size / 2, cy = size / 2, r = size / 2 - 4;
+  let angle = -Math.PI / 2;
+  let paths = '';
+  weights.forEach((w, i) => {
+    if (w === 0) return;
+    const frac = w / total;
+    if (frac >= 1 - 0.0001) {
+      // full circle
+      paths += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${colors[i]}" />`;
+      return;
+    }
+    const nextAngle = angle + frac * 2 * Math.PI;
+    const x1 = cx + r * Math.cos(angle);
+    const y1 = cy + r * Math.sin(angle);
+    const x2 = cx + r * Math.cos(nextAngle);
+    const y2 = cy + r * Math.sin(nextAngle);
+    const largeArc = frac > 0.5 ? 1 : 0;
+    paths += `<path d="M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z" fill="${colors[i]}" />`;
+    angle = nextAngle;
+  });
+  const legend = labels.map((label, i) =>
+    `<div class="legend-item"><span class="dot" style="background:${colors[i]}"></span>${label}: <b style="margin:0 4px">${grams[i]}g</b><span style="color:var(--muted);margin-left:auto">${Math.round(weights[i]/total*100)}%</span></div>`
+  ).join('');
+  container.innerHTML = `
+    <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${paths}</svg>
+    <div class="pie-legend">${legend}</div>
+  `;
+}
+
+// ---------- Renderers ----------
+function switchTab(tab) {
+  state.currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('hidden', c.id !== `tab-${tab}`));
+  renderCurrent();
+}
+function renderCurrent() {
+  if (state.currentTab === 'today') renderToday();
+  else if (state.currentTab === 'calendar') renderCalendar();
+  else if (state.currentTab === 'goal') renderGoal();
+  else if (state.currentTab === 'settings') renderSettings();
+}
+
+function renderToday() {
+  const cont = document.getElementById('tab-today');
+  const totals = getDailyTotals(state.currentDate);
+  const rec = calculateRecommendation(state.data.profile);
+  const target = rec.recommended;
+  const pct = target > 0 ? Math.round(totals.kcal / target * 100) : 0;
+  let pctClass = 'under';
+  if (pct >= 95 && pct <= 105) pctClass = 'ontarget';
+  else if (pct > 105) pctClass = 'over';
+
+  const setupWarn = (!state.settings.geminiKey || !state.settings.pat)
+    ? `<div class="setup-banner"><b>초기 설정 필요</b>설정 탭에서 GitHub PAT, Gist ID, Gemini API 키를 입력하세요.</div>`
+    : '';
+
+  const dateNav = `
+    <div class="date-nav">
+      <button onclick="changeDate(-1)">‹</button>
+      <span class="date-display ${isToday(state.currentDate) ? 'today' : ''}">${fmtDate(state.currentDate)}${isToday(state.currentDate) ? ' · 오늘' : ''}</span>
+      <button onclick="changeDate(1)">›</button>
+    </div>`;
+
+  const inputCard = `
+    <div class="card">
+      <h2>음식 추가</h2>
+      <div class="mode-toggle">
+        <button class="${state.inputMode==='text'?'active':''}" onclick="setInputMode('text')">텍스트</button>
+        <button class="${state.inputMode==='photo'?'active':''}" onclick="setInputMode('photo')">사진</button>
+      </div>
+      ${state.inputMode === 'text' ? `
+        <div class="input-row">
+          <input type="text" id="food-text" placeholder="예: 닭가슴살 200g, 김치찌개 한 그릇" />
+          <button class="btn" id="analyze-text-btn" onclick="onAnalyzeText()">분석</button>
+        </div>
+        <div class="help-text">음식 이름과 양을 편하게 입력하세요. Gemini가 영양성분을 추정합니다.</div>
+      ` : `
+        <input type="file" id="food-photo" accept="image/*" capture="environment" onchange="onPhotoSelected(event)" />
+        <div id="photo-preview-wrap"></div>
+        <div class="help-text">폰에서는 카메라 촬영, PC에서는 파일 업로드가 가능합니다.</div>
+      `}
+      <div id="preview-container"></div>
+    </div>`;
+
+  const summaryCard = `
+    <div class="card">
+      <h2>${isToday(state.currentDate) ? '오늘' : '이 날'} 요약</h2>
+      <div class="stat-big">
+        <span class="num ${pctClass}">${totals.kcal}</span><span class="unit">/ ${target} kcal</span>
+        <div class="sub">${totals.count}개 항목 · ${pct}% ${pct>105?'초과':pct>=95?'목표':'미달'}</div>
+      </div>
+      <div class="progress-bar">
+        <div class="fill ${pctClass}" style="width: ${Math.min(pct, 150)}%"></div>
+      </div>
+      <div style="margin-top: 16px">
+        <div class="pie-container" id="pie-container"></div>
+      </div>
+    </div>`;
+
+  const entries = state.data.entries[state.currentDate] || [];
+  const entriesCard = `
+    <div class="card">
+      <h2>기록 (${entries.length})</h2>
+      <div id="entries-list">
+        ${entries.length === 0 ? '<div class="empty-list">아직 기록 없음</div>' :
+          entries.map((e, i) => `
+            <div class="entry-item">
+              <div class="info">
+                <div class="time">${e.time || ''}</div>
+                <div class="name">${escapeHtml(e.name)} <span style="color:var(--muted);font-weight:400">· ${escapeHtml(e.amount)}</span></div>
+                <div class="macros">탄 ${e.carbs_g}g · 단 ${e.protein_g}g · 지 ${e.fat_g}g${e.source === 'photo' ? ' · 📷' : ''}${e.confidence === 'low' ? ' · ⚠' : ''}</div>
+              </div>
+              <div class="kcal">${e.kcal} kcal</div>
+              <button class="delete-btn" onclick="deleteEntry(${i})" title="삭제">×</button>
+            </div>`).join('')}
+      </div>
+    </div>`;
+
+  cont.innerHTML = setupWarn + dateNav + inputCard + summaryCard + entriesCard;
+  drawPieChart(document.getElementById('pie-container'), totals.carbs, totals.protein, totals.fat);
+  if (state.pendingFood) renderPreview();
+  if (state.pendingPhotoBase64 && state.inputMode === 'photo') renderPhotoPreview();
+}
+
+function renderPhotoPreview() {
+  const wrap = document.getElementById('photo-preview-wrap');
+  if (!wrap) return;
+  wrap.innerHTML = `<img class="photo-preview" src="data:${state.pendingPhotoMime};base64,${state.pendingPhotoBase64}" />
+    <button class="btn" style="margin-top:8px;width:100%" id="analyze-photo-btn" onclick="onAnalyzePhoto()">사진 분석</button>`;
+}
+
+function renderPreview() {
+  const cont = document.getElementById('preview-container');
+  if (!cont || !state.pendingFood) return;
+  const f = state.pendingFood;
+  cont.innerHTML = `
+    <div class="preview-card">
+      <div class="name">${escapeHtml(f.name)}${f.confidence === 'low' ? ' ⚠' : ''}</div>
+      <div class="amount">${escapeHtml(f.amount)} · <b>${f.kcal} kcal</b></div>
+      <div class="macros">
+        <span style="color:var(--carbs)">탄 ${f.carbs_g}g</span>
+        <span style="color:var(--protein)">단 ${f.protein_g}g</span>
+        <span style="color:var(--fat)">지 ${f.fat_g}g</span>
+        <span style="color:var(--muted);margin-left:auto">신뢰도: ${f.confidence}</span>
+      </div>
+      <div class="preview-actions">
+        <button class="btn" onclick="saveEntry()">저장</button>
+        <button class="btn btn-secondary" onclick="cancelPending()">취소</button>
+      </div>
+    </div>`;
+}
+
+function renderCalendar() {
+  const cont = document.getElementById('tab-calendar');
+  const [y, m] = state.calendarMonth.split('-').map(Number);
+  const firstDay = new Date(y, m-1, 1);
+  const lastDay = new Date(y, m, 0);
+  const startDayOfWeek = firstDay.getDay();
+  const daysInMonth = lastDay.getDate();
+  const target = calculateRecommendation(state.data.profile).recommended;
+  const todayStr = new Date().toISOString().slice(0, 10);
+
+  const cells = [];
+  // Previous month tail
+  const prevLastDay = new Date(y, m-1, 0).getDate();
+  for (let i = startDayOfWeek - 1; i >= 0; i--) {
+    cells.push({ date: `${prevMonth(y,m,prevLastDay-i)}`, otherMonth: true, dayNum: prevLastDay - i });
+  }
+  // This month
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    cells.push({ date: dateStr, otherMonth: false, dayNum: d });
+  }
+  // Next month head
+  while (cells.length % 7 !== 0) {
+    const nextD = cells.length - daysInMonth - startDayOfWeek + 1;
+    cells.push({ date: nextMonth(y, m, nextD), otherMonth: true, dayNum: nextD });
+  }
+
+  const cellHtml = cells.map(c => {
+    const totals = c.otherMonth ? { kcal: 0 } : getDailyTotals(c.date);
+    const pct = target > 0 && totals.kcal > 0 ? totals.kcal / target * 100 : 0;
+    let cls = 'calendar-cell';
+    if (c.otherMonth) cls += ' other-month';
+    if (c.date === todayStr) cls += ' today';
+    if (pct > 0) {
+      if (pct >= 95 && pct <= 105) cls += ' ontarget';
+      else if (pct > 105) cls += ' over';
+      else cls += ' under';
+    }
+    return `<div class="${cls}" onclick="jumpToDate('${c.date}')">
+      <div class="cal-date">${c.dayNum}</div>
+      <div class="cal-kcal">${totals.kcal > 0 ? totals.kcal : ''}</div>
+    </div>`;
+  }).join('');
+
+  const monthLabel = `${y}년 ${m}월`;
+
+  cont.innerHTML = `
+    <div class="card">
+      <div class="calendar-nav">
+        <button class="btn btn-secondary" onclick="shiftCalendarMonth(-1)">‹</button>
+        <span class="month-label">${monthLabel}</span>
+        <button class="btn btn-secondary" onclick="shiftCalendarMonth(1)">›</button>
+      </div>
+      <div class="calendar-grid">
+        <div class="day-label">일</div><div class="day-label">월</div><div class="day-label">화</div>
+        <div class="day-label">수</div><div class="day-label">목</div><div class="day-label">금</div><div class="day-label">토</div>
+        ${cellHtml}
+      </div>
+      <div style="display:flex;gap:12px;justify-content:center;margin-top:12px;font-size:12px;color:var(--muted)">
+        <span><span style="display:inline-block;width:10px;height:10px;background:#d1fae5;border-radius:2px;vertical-align:middle;margin-right:4px"></span>목표(95-105%)</span>
+        <span><span style="display:inline-block;width:10px;height:10px;background:#fef3c7;border-radius:2px;vertical-align:middle;margin-right:4px"></span>미달</span>
+        <span><span style="display:inline-block;width:10px;height:10px;background:#fee2e2;border-radius:2px;vertical-align:middle;margin-right:4px"></span>초과</span>
+      </div>
+    </div>`;
+}
+
+function prevMonth(y, m, d) {
+  if (m === 1) return `${y-1}-12-${String(d).padStart(2,'0')}`;
+  return `${y}-${String(m-1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+}
+function nextMonth(y, m, d) {
+  if (m === 12) return `${y+1}-01-${String(d).padStart(2,'0')}`;
+  return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+}
+
+function renderGoal() {
+  const cont = document.getElementById('tab-goal');
+  const p = state.data.profile;
+  const rec = calculateRecommendation(p);
+  const activityOpts = Object.entries(ACTIVITY_LABELS).map(([k, v]) =>
+    `<option value="${k}" ${p.activity===k?'selected':''}>${v}</option>`).join('');
+
+  cont.innerHTML = `
+    <div class="card">
+      <h2>기본 정보</h2>
+      <div class="form-grid">
+        <div class="form-row">
+          <label>성별</label>
+          <select id="pf-gender">
+            <option value="male" ${p.gender==='male'?'selected':''}>남성</option>
+            <option value="female" ${p.gender==='female'?'selected':''}>여성</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>나이</label>
+          <input type="number" id="pf-age" value="${p.age}" min="10" max="100" />
+        </div>
+        <div class="form-row">
+          <label>키 (cm)</label>
+          <input type="number" id="pf-height" value="${p.height_cm}" min="100" max="250" />
+        </div>
+        <div class="form-row">
+          <label>활동량</label>
+          <select id="pf-activity">${activityOpts}</select>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>다이어트 목표</h2>
+      <div class="form-grid">
+        <div class="form-row">
+          <label>현재 몸무게 (kg)</label>
+          <input type="number" id="pf-current" value="${p.currentKg}" step="0.1" />
+        </div>
+        <div class="form-row">
+          <label>목표 몸무게 (kg)</label>
+          <input type="number" id="pf-goal" value="${p.goalKg}" step="0.1" />
+        </div>
+        <div class="form-row" style="grid-column: 1 / -1">
+          <label>기간 (일)</label>
+          <input type="number" id="pf-days" value="${p.targetDays}" min="7" max="365" />
+        </div>
+      </div>
+      <button class="btn" onclick="saveProfileFromForm()" style="width:100%;margin-top:8px">저장 + 계산</button>
+
+      <div class="goal-result">
+        <div class="stat-row"><span class="stat-label">기초대사량 (BMR)</span><span class="stat-value">${rec.bmr} kcal</span></div>
+        <div class="stat-row"><span class="stat-label">유지 칼로리</span><span class="stat-value">${rec.maintenance} kcal</span></div>
+        <div class="stat-row"><span class="stat-label">감량 목표</span><span class="stat-value">${rec.kgToLose.toFixed(1)} kg / ${p.targetDays}일</span></div>
+        <div class="big-num">${rec.recommended} kcal</div>
+        <div class="note">권장 일일 섭취 · ${rec.note}</div>
+      </div>
+    </div>`;
+}
+
+function renderSettings() {
+  const cont = document.getElementById('tab-settings');
+  const s = state.settings;
+  cont.innerHTML = `
+    <div class="card">
+      <h2>API 키</h2>
+      <div class="form-row">
+        <label>GitHub Personal Access Token</label>
+        <input type="password" id="st-pat" value="${escapeHtml(s.pat)}" placeholder="ghp_... or github_pat_..." />
+        <div class="help-text">Gists R/W 권한만 있으면 됨</div>
+      </div>
+      <div class="form-row">
+        <label>Gist ID</label>
+        <input type="text" id="st-gist" value="${escapeHtml(s.gistId)}" placeholder="gist URL의 마지막 hash" />
+        <div class="help-text">gist.github.com URL의 슬래시 뒤 부분</div>
+      </div>
+      <div class="form-row">
+        <label>Gemini API Key</label>
+        <input type="password" id="st-gemini" value="${escapeHtml(s.geminiKey)}" placeholder="AIza..." />
+        <div class="help-text">aistudio.google.com/apikey에서 발급</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" onclick="saveSettingsFromForm()">저장</button>
+        <button class="btn btn-secondary" onclick="testConnection()">연결 테스트</button>
+        <button class="btn btn-secondary" onclick="syncFromGist()">Gist에서 불러오기 ↓</button>
+        <button class="btn btn-secondary" onclick="syncToGist()">Gist로 저장 ↑</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>백업</h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-secondary" onclick="exportData()">JSON 내보내기</button>
+        <label class="btn btn-secondary" style="cursor:pointer">
+          JSON 가져오기
+          <input type="file" accept=".json,application/json" onchange="importData(event)" style="display:none" />
+        </label>
+      </div>
+    </div>
+    <div class="card">
+      <h2>위험 구역</h2>
+      <button class="btn btn-danger" onclick="resetAll()">모든 데이터 삭제</button>
+      <div class="help-text" style="margin-top:8px">이 기기의 localStorage만 삭제됩니다. Gist는 그대로 남습니다.</div>
+    </div>`;
+}
+
+// ---------- Event handlers ----------
+function setInputMode(mode) {
+  state.inputMode = mode;
+  state.pendingFood = null;
+  state.pendingPhotoBase64 = null;
+  state.pendingPhotoMime = null;
+  renderToday();
+}
+function changeDate(delta) {
+  state.currentDate = shiftDate(state.currentDate, delta);
+  state.pendingFood = null;
+  renderToday();
+}
+function jumpToDate(date) {
+  state.currentDate = date;
+  state.calendarMonth = date.slice(0, 7);
+  switchTab('today');
+}
+function shiftCalendarMonth(delta) {
+  const [y, m] = state.calendarMonth.split('-').map(Number);
+  let ny = y, nm = m + delta;
+  while (nm < 1) { nm += 12; ny--; }
+  while (nm > 12) { nm -= 12; ny++; }
+  state.calendarMonth = `${ny}-${String(nm).padStart(2,'0')}`;
+  renderCalendar();
+}
+
+async function onAnalyzeText() {
+  const inp = document.getElementById('food-text');
+  const text = (inp?.value || '').trim();
+  if (!text) return toast('음식을 입력하세요', 'error');
+  const btn = document.getElementById('analyze-text-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loader"></span>분석 중';
+  try {
+    const food = await analyzeFoodText(text);
+    state.pendingFood = { ...food, source: 'text' };
+    renderPreview();
+    toast('분석 완료 — 확인 후 저장', 'success');
+  } catch (e) {
+    toast('분석 실패: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '분석';
+  }
+}
+
+async function onPhotoSelected(e) {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const dataUrl = reader.result;
+    const commaIdx = dataUrl.indexOf(',');
+    const b64 = dataUrl.slice(commaIdx + 1);
+    const mime = dataUrl.slice(5, dataUrl.indexOf(';'));
+    state.pendingPhotoBase64 = b64;
+    state.pendingPhotoMime = mime;
+    state.pendingFood = null;
+    renderPhotoPreview();
+  };
+  reader.readAsDataURL(file);
+}
+
+async function onAnalyzePhoto() {
+  if (!state.pendingPhotoBase64) return toast('사진을 먼저 선택하세요', 'error');
+  const btn = document.getElementById('analyze-photo-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loader"></span>사진 분석 중';
+  try {
+    const food = await analyzeFoodPhoto(state.pendingPhotoBase64, state.pendingPhotoMime);
+    state.pendingFood = { ...food, source: 'photo' };
+    renderPreview();
+    toast('분석 완료 — 확인 후 저장', 'success');
+  } catch (e) {
+    toast('분석 실패: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '사진 분석';
+  }
+}
+
+function cancelPending() {
+  state.pendingFood = null;
+  renderToday();
+}
+
+async function saveEntry() {
+  if (!state.pendingFood) return;
+  const now = new Date();
+  const time = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const entry = {
+    time,
+    name: state.pendingFood.name,
+    amount: state.pendingFood.amount,
+    kcal: Number(state.pendingFood.kcal) || 0,
+    carbs_g: Number(state.pendingFood.carbs_g) || 0,
+    protein_g: Number(state.pendingFood.protein_g) || 0,
+    fat_g: Number(state.pendingFood.fat_g) || 0,
+    confidence: state.pendingFood.confidence,
+    source: state.pendingFood.source,
+    createdAt: now.toISOString()
+  };
+  if (!state.data.entries[state.currentDate]) state.data.entries[state.currentDate] = [];
+  state.data.entries[state.currentDate].push(entry);
+  saveState();
+  state.pendingFood = null;
+  state.pendingPhotoBase64 = null;
+  state.pendingPhotoMime = null;
+  renderToday();
+  toast('저장됨', 'success');
+  // Async gist push
+  syncToGist(true);
+}
+
+async function deleteEntry(idx) {
+  const entries = state.data.entries[state.currentDate];
+  if (!entries) return;
+  if (!confirm('이 항목을 삭제할까요?')) return;
+  entries.splice(idx, 1);
+  if (entries.length === 0) delete state.data.entries[state.currentDate];
+  saveState();
+  renderToday();
+  toast('삭제됨');
+  syncToGist(true);
+}
+
+function saveProfileFromForm() {
+  const p = state.data.profile;
+  p.gender = document.getElementById('pf-gender').value;
+  p.age = Number(document.getElementById('pf-age').value) || p.age;
+  p.height_cm = Number(document.getElementById('pf-height').value) || p.height_cm;
+  p.activity = document.getElementById('pf-activity').value;
+  p.currentKg = Number(document.getElementById('pf-current').value) || p.currentKg;
+  p.goalKg = Number(document.getElementById('pf-goal').value) || p.goalKg;
+  p.targetDays = Number(document.getElementById('pf-days').value) || p.targetDays;
+  saveState();
+  renderGoal();
+  toast('저장됨', 'success');
+  syncToGist(true);
+}
+
+function saveSettingsFromForm() {
+  state.settings.pat = document.getElementById('st-pat').value.trim();
+  state.settings.gistId = document.getElementById('st-gist').value.trim();
+  state.settings.geminiKey = document.getElementById('st-gemini').value.trim();
+  saveState();
+  toast('설정 저장됨', 'success');
+}
+
+async function testConnection() {
+  saveSettingsFromForm();
+  toast('테스트 중...');
+  let ghOk = false, geminiOk = false;
+  // GitHub
+  if (state.settings.pat && state.settings.gistId) {
+    try {
+      const res = await fetch(`https://api.github.com/gists/${state.settings.gistId}`, {
+        headers: { Authorization: `token ${state.settings.pat}` }
+      });
+      ghOk = res.ok;
+      if (!res.ok) toast('GitHub: HTTP ' + res.status, 'error');
+    } catch (e) { toast('GitHub 오류: ' + e.message, 'error'); }
+  }
+  // Gemini (small test)
+  if (state.settings.geminiKey) {
+    try {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(state.settings.geminiKey)}`,
+        { method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ contents:[{parts:[{text:'Say OK'}]}], generationConfig:{maxOutputTokens:5} }) }
+      );
+      geminiOk = res.ok;
+      if (!res.ok) toast('Gemini: HTTP ' + res.status, 'error');
+    } catch (e) { toast('Gemini 오류: ' + e.message, 'error'); }
+  }
+  toast(`GitHub: ${ghOk?'✓':'✗'}  Gemini: ${geminiOk?'✓':'✗'}`, (ghOk && geminiOk) ? 'success' : 'error');
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(state.data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `diet-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData(e) {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const parsed = JSON.parse(reader.result);
+      if (!parsed.profile || !parsed.entries) throw new Error('invalid schema');
+      if (!confirm('기존 데이터를 덮어쓸까요?')) return;
+      state.data = parsed;
+      saveState();
+      renderCurrent();
+      toast('가져오기 완료', 'success');
+    } catch (err) {
+      toast('가져오기 실패: ' + err.message, 'error');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function resetAll() {
+  if (!confirm('이 기기의 모든 데이터를 삭제할까요? (Gist는 유지됨)')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  location.reload();
+}
+
+// ---------- Init ----------
+async function init() {
+  loadState();
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.addEventListener('click', () => switchTab(b.dataset.tab));
+  });
+  renderCurrent();
+  // Pull from gist on startup (silent)
+  if (state.settings.pat && state.settings.gistId) {
+    const ok = await syncFromGist(true);
+    if (ok) renderCurrent();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
