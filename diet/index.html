@@ -1243,6 +1243,28 @@ function renderSettings() {
       </div>
     </div>
     <div class="card">
+      <h2>다기기 sync</h2>
+      <div class="help-text" style="margin-bottom:12px;line-height:1.6">
+        <b style="color:var(--text)">기록/체중/목표는 이미 Gist로 자동 sync됩니다.</b><br>
+        새 기기(폰)에서 API 키 3개만 넣으면 모든 데이터가 자동으로 불러와집니다.<br>
+        아래 공유 코드로 3개를 한 번에 전송할 수 있습니다.
+      </div>
+      <div class="form-row">
+        <label>이 기기의 공유 코드</label>
+        <textarea readonly id="st-share-code" rows="3" style="font-family:monospace;font-size:11px;word-break:break-all" onclick="this.select()">${escapeHtml(generateShareCode())}</textarea>
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <button class="btn" onclick="copyShareCode()">📋 코드 복사</button>
+        </div>
+        <div class="help-text" style="color:var(--danger);margin-top:6px">⚠ 이 코드에 API 키 3개가 담김. 자신에게만 전송 (예: 카톡 나에게, 이메일)</div>
+      </div>
+      <div class="form-row" style="margin-top:16px">
+        <label>다른 기기에서 받은 공유 코드</label>
+        <textarea id="st-share-import" rows="3" style="font-family:monospace;font-size:11px" placeholder="복사한 코드를 여기에 붙여넣기"></textarea>
+        <button class="btn btn-secondary" onclick="applyShareCode()" style="margin-top:6px">↓ 코드 불러오기</button>
+        <div class="help-text">불러오면 자동으로 Gist에서 모든 데이터를 pull합니다.</div>
+      </div>
+    </div>
+    <div class="card">
       <h2>백업</h2>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn btn-secondary" onclick="exportData()">JSON 내보내기</button>
@@ -1473,6 +1495,52 @@ function resetAll() {
   if (!confirm('이 기기의 모든 데이터를 삭제할까요? (Gist는 유지됨)')) return;
   localStorage.removeItem(STORAGE_KEY);
   location.reload();
+}
+
+// ---------- Share code (multi-device setup) ----------
+function generateShareCode() {
+  const share = {
+    v: 1,
+    pat: state.settings.pat || '',
+    gistId: state.settings.gistId || '',
+    geminiKey: state.settings.geminiKey || ''
+  };
+  try {
+    return btoa(JSON.stringify(share));
+  } catch (e) { console.error(e); return ''; }
+}
+
+async function copyShareCode() {
+  const code = generateShareCode();
+  if (!code) return toast('먼저 API 키를 입력하세요', 'error');
+  try {
+    await navigator.clipboard.writeText(code);
+    toast('공유 코드 복사됨 · 자기한테 보내세요', 'success');
+  } catch (e) {
+    const ta = document.getElementById('st-share-code');
+    if (ta) { ta.focus(); ta.select(); document.execCommand('copy'); toast('복사됨', 'success'); }
+    else toast('복사 실패 · 수동으로 선택해서 복사', 'error');
+  }
+}
+
+async function applyShareCode() {
+  const inp = document.getElementById('st-share-import');
+  const code = (inp?.value || '').trim();
+  if (!code) return toast('코드를 붙여넣으세요', 'error');
+  try {
+    const parsed = JSON.parse(atob(code));
+    if (!parsed.pat && !parsed.gistId && !parsed.geminiKey) throw new Error('빈 코드');
+    if (parsed.pat) state.settings.pat = parsed.pat;
+    if (parsed.gistId) state.settings.gistId = parsed.gistId;
+    if (parsed.geminiKey) state.settings.geminiKey = parsed.geminiKey;
+    saveState();
+    toast('설정 불러옴 · Gist에서 데이터 pulling...', 'success');
+    renderSettings();
+    const ok = await syncFromGist(true);
+    if (ok) toast('완료 · 오늘 탭으로 이동해서 확인', 'success');
+  } catch (e) {
+    toast('코드 오류: ' + e.message, 'error');
+  }
 }
 
 // ---------- Weight ----------
