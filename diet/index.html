@@ -350,8 +350,38 @@
     cursor: pointer;
     padding: 0 4px;
     margin-left: 8px;
+    line-height: 1;
   }
   .entry-item .delete-btn:hover { color: var(--danger); }
+  .entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3px;
+  }
+  .entry-header .time {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .entry-name {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    line-height: 1.35;
+  }
+  .entry-macros-line {
+    font-size: 13px;
+    display: flex;
+    gap: 4px;
+    align-items: baseline;
+    flex-wrap: wrap;
+    line-height: 1.5;
+  }
+  .mac-kcal { color: var(--primary); font-weight: 700; }
+  .mac-carbs { color: var(--carbs); font-weight: 500; }
+  .mac-protein { color: var(--protein); font-weight: 500; }
+  .mac-fat { color: var(--fat); font-weight: 500; }
+  .mac-sep { color: var(--muted); }
   .empty-list {
     text-align: center;
     color: var(--muted);
@@ -707,18 +737,22 @@ async function analyzeFoodText(text) {
   return JSON.parse(content);
 }
 
-async function analyzeFoodPhoto(base64, mimeType) {
+async function analyzeFoodPhoto(base64, mimeType, hint) {
   if (!state.settings.geminiKey) throw new Error('Gemini API 키가 설정되지 않음');
-  const prompt = `당신은 사진 속 음식의 영양 성분 추정 전문가입니다.
+  const hintBlock = (hint && hint.trim())
+    ? `\n\n사용자가 사진에 대해 준 힌트: "${hint.trim()}"\n이 힌트를 최우선으로 반영해서 분석하세요. 힌트에 명시된 양/이름이 있으면 그대로 쓰고, 힌트가 언급하지 않은 부분만 사진으로 추정하세요.`
+    : '';
+  const prompt = `당신은 사진 속 음식의 영양 성분 추정 전문가입니다.${hintBlock}
+
 이 사진의 음식을 분석하고, 정확히 아래 JSON 스키마로만 응답하세요:
 {
-  "name": "음식 이름 (한글 우선)",
-  "amount": "사진에서 추정한 양 (예: '1인분', '1공기', '약 200g')",
+  "name": "음식 이름 (한글 우선). 힌트가 있으면 힌트의 이름을 반영",
+  "amount": "양 (예: '1인분', '1공기', '약 200g'). 힌트에 양이 명시되면 그 값 사용",
   "kcal": 정수 칼로리,
   "carbs_g": 정수 탄수화물(g),
   "protein_g": 정수 단백질(g),
   "fat_g": 정수 지방(g),
-  "confidence": "high" | "medium" | "low"
+  "confidence": "high" | "medium" | "low" (힌트가 있으면 신뢰도 올림)
 }
 여러 음식이 있으면 합산. 접시 크기/그릇 참고. 마크다운 없이 JSON만.`;
 
@@ -852,9 +886,22 @@ function drawPieChart(container, carbs, protein, fat) {
     paths += `<path d="M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z" fill="${colors[i]}" />`;
     angle = nextAngle;
   });
-  const legend = labels.map((label, i) =>
-    `<div class="legend-item"><span class="dot" style="background:${colors[i]}"></span>${label}: <b style="margin:0 4px">${grams[i]}g</b><span style="color:var(--muted);margin-left:auto">${Math.round(weights[i]/total*100)}%</span></div>`
-  ).join('');
+  const p = state.data.profile;
+  const targetPcts = [p.carbsPct || 40, p.proteinPct || 30, p.fatPct || 30];
+  const legend = labels.map((label, i) => {
+    const actualPct = Math.round(weights[i] / total * 100);
+    const targetPct = targetPcts[i];
+    const diff = actualPct - targetPct;
+    let diffColor = 'var(--success)';
+    if (Math.abs(diff) > 10) diffColor = 'var(--danger)';
+    else if (Math.abs(diff) > 5) diffColor = 'var(--warning)';
+    const arrow = diff > 0 ? '▲' : diff < 0 ? '▼' : '=';
+    return `<div class="legend-item">
+      <span class="dot" style="background:${colors[i]}"></span>
+      <span style="flex:1">${label}</span>
+      <span><b>${grams[i]}g</b> · <b>${actualPct}%</b> <span style="color:var(--muted)">/ 권장 ${targetPct}%</span> <span style="color:${diffColor};font-weight:600;margin-left:4px">${arrow}${Math.abs(diff)}%p</span></span>
+    </div>`;
+  }).join('');
   container.innerHTML = `
     <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${paths}</svg>
     <div class="pie-legend">${legend}</div>
@@ -913,7 +960,8 @@ function renderToday() {
       ` : `
         <input type="file" id="food-photo" accept="image/*" capture="environment" onchange="onPhotoSelected(event)" />
         <div id="photo-preview-wrap"></div>
-        <div class="help-text">폰에서는 카메라 촬영, PC에서는 파일 업로드가 가능합니다.</div>
+        <textarea id="photo-hint" rows="2" placeholder="(선택) 힌트: 예 '고기 200g 정도', '오른쪽 그릇은 김치찌개', '왼쪽만 봐줘'" style="margin-top:8px;resize:vertical;min-height:44px"></textarea>
+        <div class="help-text">폰: 카메라 촬영, PC: 파일 업로드. 힌트를 함께 넣으면 정확도가 올라갑니다.</div>
       `}
       <div id="preview-container"></div>
     </div>`;
@@ -972,12 +1020,22 @@ function renderToday() {
           entries.map((e, i) => `
             <div class="entry-item">
               <div class="info">
-                <div class="time">${e.time || ''}</div>
-                <div class="name">${escapeHtml(e.name)} <span style="color:var(--muted);font-weight:400">· ${escapeHtml(e.amount)}</span></div>
-                <div class="macros">탄 ${e.carbs_g}g · 단 ${e.protein_g}g · 지 ${e.fat_g}g${e.source === 'photo' ? ' · 📷' : ''}${e.confidence === 'low' ? ' · ⚠' : ''}</div>
+                <div class="entry-header">
+                  <span class="time">${e.time || ''}${e.source === 'photo' ? ' · 📷' : ''}${e.confidence === 'low' ? ' · ⚠ 신뢰도 낮음' : ''}</span>
+                  <button class="delete-btn" onclick="deleteEntry(${i})" title="삭제">×</button>
+                </div>
+                <div class="entry-name">${escapeHtml(e.name)} <span style="color:var(--muted);font-weight:400">· ${escapeHtml(e.amount)}</span></div>
+                <div class="entry-macros-line">
+                  <span class="mac-kcal">${e.kcal} kcal</span>
+                  <span class="mac-sep">(</span>
+                  <span class="mac-carbs">탄 ${e.carbs_g}g</span>
+                  <span class="mac-sep">·</span>
+                  <span class="mac-protein">단 ${e.protein_g}g</span>
+                  <span class="mac-sep">·</span>
+                  <span class="mac-fat">지 ${e.fat_g}g</span>
+                  <span class="mac-sep">)</span>
+                </div>
               </div>
-              <div class="kcal">${e.kcal} kcal</div>
-              <button class="delete-btn" onclick="deleteEntry(${i})" title="삭제">×</button>
             </div>`).join('')}
       </div>
     </div>`;
@@ -1267,12 +1325,13 @@ async function onPhotoSelected(e) {
 
 async function onAnalyzePhoto() {
   if (!state.pendingPhotoBase64) return toast('사진을 먼저 선택하세요', 'error');
+  const hint = document.getElementById('photo-hint')?.value || '';
   const btn = document.getElementById('analyze-photo-btn');
   btn.disabled = true;
   btn.innerHTML = '<span class="loader"></span>사진 분석 중';
   try {
-    const food = await analyzeFoodPhoto(state.pendingPhotoBase64, state.pendingPhotoMime);
-    state.pendingFood = { ...food, source: 'photo' };
+    const food = await analyzeFoodPhoto(state.pendingPhotoBase64, state.pendingPhotoMime, hint);
+    state.pendingFood = { ...food, source: 'photo', hint: hint.trim() || undefined };
     renderPreview();
     toast('분석 완료 — 확인 후 저장', 'success');
   } catch (e) {
