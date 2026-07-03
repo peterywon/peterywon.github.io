@@ -395,14 +395,48 @@
   .calendar-cell:hover { border-color: var(--primary); }
   .calendar-cell.today { border-color: var(--primary); }
   .calendar-cell.other-month { opacity: 0.3; }
+  .calendar-cell .cal-date-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 2px;
+  }
   .calendar-cell .cal-date {
     font-size: 12px;
+    font-weight: 500;
+  }
+  .calendar-cell .cal-weight {
+    font-size: 9px;
+    color: var(--fat);
     font-weight: 500;
   }
   .calendar-cell .cal-kcal {
     font-size: 10px;
     color: var(--muted);
     text-align: right;
+  }
+  .chart-wrap { width: 100%; }
+  .chart-wrap svg { display: block; width: 100%; height: auto; }
+  .period-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 4px 0;
+    flex-wrap: wrap;
+  }
+  .period-tabs button {
+    padding: 6px 12px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .period-tabs button.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
   }
   .calendar-cell.ontarget { background: #d1fae5; }
   .calendar-cell.under { background: #fef3c7; }
@@ -486,12 +520,14 @@
   <div class="tabs">
     <button class="tab-btn active" data-tab="today">오늘</button>
     <button class="tab-btn" data-tab="calendar">캘린더</button>
+    <button class="tab-btn" data-tab="stats">통계</button>
     <button class="tab-btn" data-tab="goal">목표</button>
     <button class="tab-btn" data-tab="settings">설정</button>
   </div>
 
   <section id="tab-today" class="tab-content"></section>
   <section id="tab-calendar" class="tab-content hidden"></section>
+  <section id="tab-stats" class="tab-content hidden"></section>
   <section id="tab-goal" class="tab-content hidden"></section>
   <section id="tab-settings" class="tab-content hidden"></section>
 </div>
@@ -526,12 +562,14 @@ let state = {
       activity: 'light',
       carbsPct: 40, proteinPct: 30, fatPct: 30
     },
-    entries: {}
+    entries: {},
+    weights: {}
   },
   currentDate: new Date().toISOString().slice(0, 10),
   calendarMonth: new Date().toISOString().slice(0, 7),
   currentTab: 'today',
   inputMode: 'text',
+  statsPeriod: 30,
   pendingFood: null,
   pendingPhotoBase64: null,
   pendingPhotoMime: null
@@ -547,6 +585,7 @@ function loadState() {
       if (parsed.data) {
         state.data.profile = { ...state.data.profile, ...(parsed.data.profile || {}) };
         state.data.entries = parsed.data.entries || {};
+        state.data.weights = parsed.data.weights || {};
       }
     } catch (e) { console.error('loadState:', e); }
   }
@@ -581,6 +620,7 @@ async function syncFromGist(silent = false) {
     const remote = JSON.parse(file.content || '{}');
     if (remote.profile) state.data.profile = { ...state.data.profile, ...remote.profile };
     if (remote.entries) state.data.entries = remote.entries;
+    if (remote.weights) state.data.weights = remote.weights;
     saveState();
     setSyncStatus('✓ synced ' + new Date().toLocaleTimeString('ko-KR', {hour:'2-digit',minute:'2-digit'}));
     if (!silent) toast('Gist에서 불러옴', 'success');
@@ -831,6 +871,7 @@ function switchTab(tab) {
 function renderCurrent() {
   if (state.currentTab === 'today') renderToday();
   else if (state.currentTab === 'calendar') renderCalendar();
+  else if (state.currentTab === 'stats') renderStats();
   else if (state.currentTab === 'goal') renderGoal();
   else if (state.currentTab === 'settings') renderSettings();
 }
@@ -892,6 +933,36 @@ function renderToday() {
       </div>
     </div>`;
 
+  // Weight card
+  const weightsMap = state.data.weights || {};
+  const currentWeight = weightsMap[state.currentDate];
+  const prevWeightEntries = Object.entries(weightsMap)
+    .filter(([d]) => d < state.currentDate)
+    .sort((a, b) => b[0].localeCompare(a[0]));
+  const prevW = prevWeightEntries[0];
+  let weightHelp;
+  if (currentWeight !== undefined && prevW) {
+    const delta = currentWeight - prevW[1];
+    const sign = delta >= 0 ? '+' : '';
+    weightHelp = `이전 기록(${prevW[0].slice(5)}) 대비 <b>${sign}${delta.toFixed(1)} kg</b>`;
+  } else if (currentWeight !== undefined) {
+    weightHelp = '첫 기록 · kg 단위';
+  } else if (prevW) {
+    weightHelp = `가장 최근 기록: ${prevW[0].slice(5)} · <b>${prevW[1]} kg</b>`;
+  } else {
+    weightHelp = 'kg 단위 · 매일 아침 재기 권장';
+  }
+  const weightCard = `
+    <div class="card">
+      <h2>체중 기록</h2>
+      <div class="input-row">
+        <input type="number" id="weight-input" step="0.1" value="${currentWeight ?? ''}" placeholder="예: 74.5" />
+        <button class="btn" onclick="saveWeight()">${currentWeight !== undefined ? '수정' : '저장'}</button>
+        ${currentWeight !== undefined ? '<button class="btn btn-secondary" onclick="deleteWeight()" style="padding:10px 12px">삭제</button>' : ''}
+      </div>
+      <div class="help-text" style="margin-top:6px">${weightHelp}</div>
+    </div>`;
+
   const entries = state.data.entries[state.currentDate] || [];
   const entriesCard = `
     <div class="card">
@@ -911,7 +982,7 @@ function renderToday() {
       </div>
     </div>`;
 
-  cont.innerHTML = setupWarn + dateNav + inputCard + summaryCard + entriesCard;
+  cont.innerHTML = setupWarn + dateNav + inputCard + summaryCard + weightCard + entriesCard;
   drawPieChart(document.getElementById('pie-container'), totals.carbs, totals.protein, totals.fat);
   if (state.pendingFood) renderPreview();
   if (state.pendingPhotoBase64 && state.inputMode === 'photo') renderPhotoPreview();
@@ -972,8 +1043,10 @@ function renderCalendar() {
     cells.push({ date: nextMonth(y, m, nextD), otherMonth: true, dayNum: nextD });
   }
 
+  const weightsMap = state.data.weights || {};
   const cellHtml = cells.map(c => {
     const totals = c.otherMonth ? { kcal: 0 } : getDailyTotals(c.date);
+    const weight = c.otherMonth ? null : weightsMap[c.date];
     const pct = target > 0 && totals.kcal > 0 ? totals.kcal / target * 100 : 0;
     let cls = 'calendar-cell';
     if (c.otherMonth) cls += ' other-month';
@@ -984,7 +1057,10 @@ function renderCalendar() {
       else cls += ' under';
     }
     return `<div class="${cls}" onclick="jumpToDate('${c.date}')">
-      <div class="cal-date">${c.dayNum}</div>
+      <div class="cal-date-row">
+        <span class="cal-date">${c.dayNum}</span>
+        ${weight !== undefined && weight !== null ? `<span class="cal-weight">${weight}</span>` : ''}
+      </div>
       <div class="cal-kcal">${totals.kcal > 0 ? totals.kcal : ''}</div>
     </div>`;
   }).join('');
@@ -1338,6 +1414,293 @@ function resetAll() {
   if (!confirm('이 기기의 모든 데이터를 삭제할까요? (Gist는 유지됨)')) return;
   localStorage.removeItem(STORAGE_KEY);
   location.reload();
+}
+
+// ---------- Weight ----------
+async function saveWeight() {
+  const val = parseFloat(document.getElementById('weight-input').value);
+  if (!Number.isFinite(val) || val < 20 || val > 300) {
+    return toast('올바른 체중을 입력하세요 (20-300 kg)', 'error');
+  }
+  if (!state.data.weights) state.data.weights = {};
+  state.data.weights[state.currentDate] = Math.round(val * 10) / 10;
+  saveState();
+  renderToday();
+  toast('체중 저장됨', 'success');
+  syncToGist(true);
+}
+async function deleteWeight() {
+  if (!confirm('이 날의 체중 기록을 삭제할까요?')) return;
+  if (state.data.weights) delete state.data.weights[state.currentDate];
+  saveState();
+  renderToday();
+  toast('삭제됨');
+  syncToGist(true);
+}
+
+// ---------- Stats ----------
+function setStatsPeriod(n) {
+  state.statsPeriod = n;
+  renderStats();
+}
+
+function renderStats() {
+  const cont = document.getElementById('tab-stats');
+  const days = state.statsPeriod || 30;
+  const today = new Date();
+  const dates = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    dates.push(d.toISOString().slice(0, 10));
+  }
+  const rec = calculateRecommendation(state.data.profile);
+  const target = rec.recommended;
+
+  const kcalData = dates.map(d => {
+    const t = getDailyTotals(d);
+    return { date: d, kcal: t.kcal, value: t.kcal > 0 ? Math.round(t.kcal / target * 100) : 0, count: t.count };
+  });
+  const daysLogged = kcalData.filter(d => d.count > 0).length;
+  const avgPct = daysLogged > 0
+    ? Math.round(kcalData.filter(d => d.count > 0).reduce((s, d) => s + d.value, 0) / daysLogged)
+    : 0;
+
+  const weightsMap = state.data.weights || {};
+  const weightData = dates
+    .filter(d => weightsMap[d] !== undefined)
+    .map(d => ({ date: d, value: weightsMap[d] }));
+
+  let weightDelta = '기록 부족';
+  let weightDeltaClass = '';
+  if (weightData.length >= 2) {
+    const first = weightData[0].value;
+    const last = weightData[weightData.length - 1].value;
+    const delta = last - first;
+    const sign = delta > 0 ? '+' : '';
+    weightDelta = `${sign}${delta.toFixed(1)} kg (${weightData.length}회)`;
+    weightDeltaClass = delta < 0 ? 'ontarget' : delta > 0 ? 'over' : '';
+  }
+
+  // Average macros
+  let sumC = 0, sumP = 0, sumF = 0, macroDays = 0;
+  dates.forEach(d => {
+    const t = getDailyTotals(d);
+    if (t.count > 0) { sumC += t.carbs; sumP += t.protein; sumF += t.fat; macroDays++; }
+  });
+  const avgActual = macroDays > 0 ? {
+    carbs: sumC / macroDays, protein: sumP / macroDays, fat: sumF / macroDays
+  } : { carbs: 0, protein: 0, fat: 0 };
+
+  const p = state.data.profile;
+  const targetMacros = {
+    carbs: target * (p.carbsPct || 40) / 100 / 4,
+    protein: target * (p.proteinPct || 30) / 100 / 4,
+    fat: target * (p.fatPct || 30) / 100 / 9
+  };
+
+  const periodOpts = [7, 30, 90].map(n =>
+    `<button class="${days === n ? 'active' : ''}" onclick="setStatsPeriod(${n})">${n}일</button>`
+  ).join('');
+
+  cont.innerHTML = `
+    <div class="card">
+      <h2>기간</h2>
+      <div class="period-tabs">${periodOpts}</div>
+      <div class="stat-row" style="margin-top:8px"><span class="stat-label">기록한 날</span><span class="stat-value">${daysLogged} / ${days}일</span></div>
+      <div class="stat-row"><span class="stat-label">평균 달성률</span><span class="stat-value">${avgPct}%</span></div>
+      <div class="stat-row"><span class="stat-label">체중 변화</span><span class="stat-value ${weightDeltaClass === 'ontarget' ? '' : ''}" style="color:${weightDeltaClass === 'ontarget' ? 'var(--success)' : weightDeltaClass === 'over' ? 'var(--danger)' : 'var(--text)'}">${weightDelta}</span></div>
+    </div>
+
+    <div class="card">
+      <h2>몸무게 추이</h2>
+      <div class="chart-wrap" id="stats-weight-chart"></div>
+      <div class="help-text" style="margin-top:8px">목표: ${p.goalKg}kg (점선). 오늘 탭에서 체중 입력하면 반영됩니다.</div>
+    </div>
+
+    <div class="card">
+      <h2>일별 칼로리 달성률</h2>
+      <div class="chart-wrap" id="stats-kcal-chart"></div>
+      <div class="help-text" style="margin-top:8px">목표 ${target} kcal 대비 %. 초록=95-105% · 노랑=미달 · 빨강=초과</div>
+    </div>
+
+    <div class="card">
+      <h2>탄단지 실제 vs 목표 (${macroDays}일 평균)</h2>
+      <div class="chart-wrap" id="stats-macros-chart"></div>
+      <div class="help-text" style="margin-top:8px">진한 바 = 실제 평균 · 흐린 바 = 권장 (탄 ${p.carbsPct}% / 단 ${p.proteinPct}% / 지 ${p.fatPct}%)</div>
+    </div>
+  `;
+
+  drawLineChart(document.getElementById('stats-weight-chart'), weightData, {
+    goalLine: p.goalKg,
+    color: '#0ea5e9',
+    formatY: v => v.toFixed(1)
+  });
+  drawBarChart(document.getElementById('stats-kcal-chart'), kcalData);
+  drawMacrosBar(document.getElementById('stats-macros-chart'), avgActual, targetMacros);
+}
+
+// ---------- Charts ----------
+function drawLineChart(container, data, opts) {
+  const W = 320, H = 180, pL = 44, pR = 12, pT = 12, pB = 24;
+  if (data.length === 0) {
+    container.innerHTML = '<div class="empty-chart">아직 데이터 없음</div>';
+    return;
+  }
+  const values = data.map(d => d.value);
+  const withGoal = opts.goalLine !== undefined ? [...values, opts.goalLine] : values;
+  let minY = Math.min(...withGoal);
+  let maxY = Math.max(...withGoal);
+  if (minY === maxY) { minY -= 1; maxY += 1; }
+  const range = maxY - minY;
+  minY -= range * 0.1;
+  maxY += range * 0.1;
+  const cW = W - pL - pR;
+  const cH = H - pT - pB;
+  const step = data.length > 1 ? cW / (data.length - 1) : 0;
+  const points = data.map((d, i) => ({
+    x: pL + (data.length === 1 ? cW / 2 : i * step),
+    y: pT + (1 - (d.value - minY) / (maxY - minY)) * cH,
+    date: d.date, val: d.value
+  }));
+  const linePath = data.length > 1
+    ? points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ')
+    : '';
+  const dots = points.map(p =>
+    `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3" fill="${opts.color}"><title>${p.date}: ${p.val}</title></circle>`
+  ).join('');
+  let goalLine = '';
+  if (opts.goalLine !== undefined) {
+    const y = pT + (1 - (opts.goalLine - minY) / (maxY - minY)) * cH;
+    goalLine = `
+      <line x1="${pL}" y1="${y.toFixed(1)}" x2="${W - pR}" y2="${y.toFixed(1)}" stroke="var(--success)" stroke-dasharray="4 4" stroke-width="1"/>
+      <text x="${W - pR - 4}" y="${(y - 4).toFixed(1)}" text-anchor="end" font-size="10" fill="var(--success)">목표 ${opts.formatY(opts.goalLine)}</text>`;
+  }
+  const yTicks = [maxY, (maxY + minY) / 2, minY];
+  const yLabels = yTicks.map((v, i) => {
+    const yPos = pT + i * cH / 2;
+    return `<text x="${pL - 6}" y="${(yPos + 3).toFixed(1)}" text-anchor="end" font-size="10" fill="var(--muted)">${opts.formatY(v)}</text>`;
+  }).join('');
+  const nLabels = Math.min(5, data.length);
+  const labelIdxs = Array.from({length: nLabels}, (_, i) =>
+    Math.round(i * (data.length - 1) / (nLabels - 1 || 1))
+  ).filter((v, i, a) => a.indexOf(v) === i);
+  const xLabels = labelIdxs.map(i => {
+    const p = points[i];
+    return `<text x="${p.x.toFixed(1)}" y="${H - 6}" text-anchor="middle" font-size="10" fill="var(--muted)">${p.date.slice(5)}</text>`;
+  }).join('');
+  container.innerHTML = `
+    <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" style="max-width:100%">
+      <line x1="${pL}" y1="${pT}" x2="${pL}" y2="${H - pB}" stroke="var(--border)" stroke-width="1"/>
+      <line x1="${pL}" y1="${H - pB}" x2="${W - pR}" y2="${H - pB}" stroke="var(--border)" stroke-width="1"/>
+      ${goalLine}
+      ${data.length > 1 ? `<path d="${linePath}" stroke="${opts.color}" stroke-width="2" fill="none"/>` : ''}
+      ${dots}
+      ${yLabels}
+      ${xLabels}
+    </svg>
+  `;
+}
+
+function drawBarChart(container, data) {
+  const W = 320, H = 180, pL = 40, pR = 12, pT = 12, pB = 24;
+  const filled = data.filter(d => d.count > 0);
+  if (filled.length === 0) {
+    container.innerHTML = '<div class="empty-chart">아직 데이터 없음</div>';
+    return;
+  }
+  const cW = W - pL - pR;
+  const cH = H - pT - pB;
+  const maxVal = Math.max(150, Math.max(...data.map(d => d.value)));
+  const barTotalW = cW / data.length;
+  const barW = Math.max(2, barTotalW - 1);
+  const bars = data.map((d, i) => {
+    if (d.value === 0) return '';
+    const x = pL + i * barTotalW;
+    const bH = (d.value / maxVal) * cH;
+    const y = pT + cH - bH;
+    let color = 'var(--success)';
+    if (d.value > 105) color = 'var(--danger)';
+    else if (d.value < 95) color = 'var(--warning)';
+    return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${bH.toFixed(1)}" fill="${color}" rx="1"><title>${d.date}: ${d.value}% (${d.kcal} kcal)</title></rect>`;
+  }).join('');
+  const y100 = pT + cH * (1 - 100 / maxVal);
+  const line100 = `
+    <line x1="${pL}" y1="${y100.toFixed(1)}" x2="${W - pR}" y2="${y100.toFixed(1)}" stroke="var(--primary)" stroke-dasharray="4 4"/>
+    <text x="${W - pR - 4}" y="${(y100 - 4).toFixed(1)}" text-anchor="end" font-size="10" fill="var(--primary)">100%</text>`;
+  const yTicks = [Math.round(maxVal), 100, 0];
+  const yLabels = yTicks.map(v => {
+    const y = pT + cH * (1 - v / maxVal);
+    return `<text x="${pL - 6}" y="${(y + 3).toFixed(1)}" text-anchor="end" font-size="10" fill="var(--muted)">${v}%</text>`;
+  }).join('');
+  const nLabels = Math.min(5, data.length);
+  const labelIdxs = Array.from({length: nLabels}, (_, i) =>
+    Math.round(i * (data.length - 1) / (nLabels - 1 || 1))
+  ).filter((v, i, a) => a.indexOf(v) === i);
+  const xLabels = labelIdxs.map(i => {
+    const x = pL + i * barTotalW + barW / 2;
+    return `<text x="${x.toFixed(1)}" y="${H - 6}" text-anchor="middle" font-size="10" fill="var(--muted)">${data[i].date.slice(5)}</text>`;
+  }).join('');
+  container.innerHTML = `
+    <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" style="max-width:100%">
+      <line x1="${pL}" y1="${pT}" x2="${pL}" y2="${H - pB}" stroke="var(--border)"/>
+      <line x1="${pL}" y1="${H - pB}" x2="${W - pR}" y2="${H - pB}" stroke="var(--border)"/>
+      ${line100}
+      ${bars}
+      ${yLabels}
+      ${xLabels}
+    </svg>
+  `;
+}
+
+function drawMacrosBar(container, actual, target) {
+  const W = 320, H = 180, pL = 40, pR = 12, pT = 24, pB = 34;
+  if (target.carbs + target.protein + target.fat === 0) {
+    container.innerHTML = '<div class="empty-chart">목표 설정 필요</div>';
+    return;
+  }
+  const cW = W - pL - pR;
+  const cH = H - pT - pB;
+  const groups = [
+    { label: '탄수화물', actual: actual.carbs, target: target.carbs, color: 'var(--carbs)' },
+    { label: '단백질', actual: actual.protein, target: target.protein, color: 'var(--protein)' },
+    { label: '지방', actual: actual.fat, target: target.fat, color: 'var(--fat)' }
+  ];
+  const maxVal = Math.max(1, ...groups.flatMap(g => [g.actual, g.target])) * 1.15;
+  const gW = cW / groups.length;
+  const bW = gW / 3;
+  let bars = '', labels = '';
+  groups.forEach((g, i) => {
+    const gx = pL + i * gW + gW / 2;
+    const aH = (g.actual / maxVal) * cH;
+    const tH = (g.target / maxVal) * cH;
+    bars += `<rect x="${(gx - bW).toFixed(1)}" y="${(pT + cH - aH).toFixed(1)}" width="${(bW - 2).toFixed(1)}" height="${aH.toFixed(1)}" fill="${g.color}" opacity="1"><title>실제: ${Math.round(g.actual)}g</title></rect>`;
+    bars += `<rect x="${(gx + 2).toFixed(1)}" y="${(pT + cH - tH).toFixed(1)}" width="${(bW - 2).toFixed(1)}" height="${tH.toFixed(1)}" fill="${g.color}" opacity="0.35"><title>목표: ${Math.round(g.target)}g</title></rect>`;
+    labels += `<text x="${gx.toFixed(1)}" y="${H - 16}" text-anchor="middle" font-size="11" fill="var(--text)">${g.label}</text>`;
+    labels += `<text x="${gx.toFixed(1)}" y="${H - 4}" text-anchor="middle" font-size="10" fill="var(--muted)">${Math.round(g.actual)} / ${Math.round(g.target)}g</text>`;
+  });
+  const legend = `
+    <g transform="translate(${pL}, 8)">
+      <rect x="0" y="0" width="10" height="10" fill="var(--muted)" opacity="1"/>
+      <text x="14" y="9" font-size="10" fill="var(--text)">실제</text>
+      <rect x="56" y="0" width="10" height="10" fill="var(--muted)" opacity="0.35"/>
+      <text x="70" y="9" font-size="10" fill="var(--text)">권장</text>
+    </g>`;
+  const yTicks = [Math.round(maxVal), Math.round(maxVal / 2), 0];
+  const yLabels = yTicks.map(v => {
+    const y = pT + cH * (1 - v / maxVal);
+    return `<text x="${pL - 6}" y="${(y + 3).toFixed(1)}" text-anchor="end" font-size="10" fill="var(--muted)">${v}g</text>`;
+  }).join('');
+  container.innerHTML = `
+    <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" style="max-width:100%">
+      <line x1="${pL}" y1="${pT}" x2="${pL}" y2="${H - pB}" stroke="var(--border)"/>
+      <line x1="${pL}" y1="${H - pB}" x2="${W - pR}" y2="${H - pB}" stroke="var(--border)"/>
+      ${legend}
+      ${yLabels}
+      ${bars}
+      ${labels}
+    </svg>
+  `;
 }
 
 // ---------- Init ----------
