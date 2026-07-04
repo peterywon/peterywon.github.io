@@ -382,6 +382,14 @@
   .mac-protein { color: var(--protein); font-weight: 500; }
   .mac-fat { color: var(--fat); font-weight: 500; }
   .mac-sep { color: var(--muted); }
+  .mac-burned { color: var(--success); font-weight: 700; }
+  .entry-exercise {
+    background: linear-gradient(90deg, rgba(16,185,129,0.06), transparent 60%);
+    border-left: 3px solid var(--success);
+    padding-left: 10px;
+    margin-left: -10px;
+    border-radius: 0 6px 6px 0;
+  }
   .empty-list {
     text-align: center;
     color: var(--muted);
@@ -785,6 +793,58 @@ async function analyzeFoodPhoto(base64, mimeType, hint) {
   return JSON.parse(content);
 }
 
+async function analyzeExercise(text) {
+  if (!state.settings.geminiKey) throw new Error('Gemini API 키가 설정되지 않음');
+  const kg = state.data.profile.currentKg;
+  const prompt = `당신은 운동 소모 칼로리 계산 전문가입니다.
+
+사용자 체중: ${kg} kg
+운동 설명: "${text}"
+
+MET(Metabolic Equivalent of Task) 값과 체중을 사용해 소모 칼로리 계산:
+  kcal = MET × 체중(kg) × 시간(hours)
+
+일반적 MET 값 참고:
+- 걷기 4km/h: 3.5 · 걷기 6km/h: 5.0
+- 조깅 6km/h: 6.0 · 조깅 8km/h: 8.3 · 러닝 10km/h: 9.8
+- 자전거 여유: 4.0 · 자전거 20km/h: 8.0 · 자전거 30km/h+: 12
+- 웨이트 트레이닝: 3.5-6.0 (강도별)
+- 수영: 6-10 · 요가: 2.5-4 · 필라테스: 3-4
+- 축구/농구/테니스: 7-8 · 배드민턴: 5.5
+- HIIT/크로스핏: 8-10 · 계단오르기: 8-9
+- 골프(카트X): 4.8 · 볼링: 3.8 · 등산: 6-8
+
+정확히 아래 JSON 스키마로만 응답:
+{
+  "name": "운동 이름 (한글)",
+  "amount": "시간·강도·거리 요약 (예: '30분 8km/h', '1시간 웨이트', '10km 45분')",
+  "kcal": 소모 칼로리 (양수 정수),
+  "duration_min": 대략 소요 분 (정수),
+  "confidence": "high" | "medium" | "low"
+}
+마크다운 없이 JSON만.`;
+
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(state.settings.geminiKey)}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { responseMimeType: 'application/json', temperature: 0.2 }
+      })
+    }
+  );
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Gemini ${res.status}: ${err.slice(0, 150)}`);
+  }
+  const data = await res.json();
+  const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!content) throw new Error('Gemini 응답 없음');
+  return JSON.parse(content);
+}
+
 // ---------- Nutrition Math ----------
 function calculateBMR(profile) {
   const { gender, age, height_cm, currentKg } = profile;
@@ -814,14 +874,33 @@ function calculateRecommendation(profile) {
 }
 function getDailyTotals(date) {
   const entries = state.data.entries[date] || [];
-  let kcal = 0, carbs = 0, protein = 0, fat = 0;
+  let consumed = 0, burned = 0, carbs = 0, protein = 0, fat = 0;
+  let foodCount = 0, exerciseCount = 0;
   entries.forEach(e => {
-    kcal += Number(e.kcal || 0);
-    carbs += Number(e.carbs_g || 0);
-    protein += Number(e.protein_g || 0);
-    fat += Number(e.fat_g || 0);
+    const type = e.type || 'food';
+    if (type === 'exercise') {
+      burned += Number(e.kcal || 0);
+      exerciseCount++;
+    } else {
+      consumed += Number(e.kcal || 0);
+      carbs += Number(e.carbs_g || 0);
+      protein += Number(e.protein_g || 0);
+      fat += Number(e.fat_g || 0);
+      foodCount++;
+    }
   });
-  return { kcal: Math.round(kcal), carbs: Math.round(carbs), protein: Math.round(protein), fat: Math.round(fat), count: entries.length };
+  const net = consumed - burned;
+  return {
+    consumed: Math.round(consumed),
+    burned: Math.round(burned),
+    net: Math.round(net),
+    kcal: Math.round(net),
+    carbs: Math.round(carbs),
+    protein: Math.round(protein),
+    fat: Math.round(fat),
+    count: entries.length,
+    foodCount, exerciseCount
+  };
 }
 
 // ---------- Utils ----------
@@ -944,12 +1023,14 @@ function renderToday() {
       <button onclick="changeDate(1)">›</button>
     </div>`;
 
+  const cardTitle = state.inputMode === 'exercise' ? '운동 추가' : '음식 추가';
   const inputCard = `
     <div class="card">
-      <h2>음식 추가</h2>
+      <h2>${cardTitle}</h2>
       <div class="mode-toggle">
-        <button class="${state.inputMode==='text'?'active':''}" onclick="setInputMode('text')">텍스트</button>
-        <button class="${state.inputMode==='photo'?'active':''}" onclick="setInputMode('photo')">사진</button>
+        <button class="${state.inputMode==='text'?'active':''}" onclick="setInputMode('text')">🍽 텍스트</button>
+        <button class="${state.inputMode==='photo'?'active':''}" onclick="setInputMode('photo')">📷 사진</button>
+        <button class="${state.inputMode==='exercise'?'active':''}" onclick="setInputMode('exercise')">🏃 운동</button>
       </div>
       ${state.inputMode === 'text' ? `
         <div class="input-row">
@@ -957,11 +1038,17 @@ function renderToday() {
           <button class="btn" id="analyze-text-btn" onclick="onAnalyzeText()">분석</button>
         </div>
         <div class="help-text">음식 이름과 양을 편하게 입력하세요. Gemini가 영양성분을 추정합니다.</div>
-      ` : `
+      ` : state.inputMode === 'photo' ? `
         <input type="file" id="food-photo" accept="image/*" capture="environment" onchange="onPhotoSelected(event)" />
         <div id="photo-preview-wrap"></div>
         <textarea id="photo-hint" rows="2" placeholder="(선택) 힌트: 예 '고기 200g 정도', '오른쪽 그릇은 김치찌개', '왼쪽만 봐줘'" style="margin-top:8px;resize:vertical;min-height:44px"></textarea>
         <div class="help-text">폰: 카메라 촬영, PC: 파일 업로드. 힌트를 함께 넣으면 정확도가 올라갑니다.</div>
+      ` : `
+        <div class="input-row">
+          <input type="text" id="exercise-text" placeholder="예: 조깅 30분, 자전거 1시간, 웨이트 45분" />
+          <button class="btn" id="analyze-exercise-btn" onclick="onAnalyzeExercise()">분석</button>
+        </div>
+        <div class="help-text">운동 이름과 시간(강도)를 입력하세요. 체중(${state.data.profile.currentKg}kg) × MET × 시간으로 소모 kcal 계산.</div>
       `}
       <div id="preview-container"></div>
     </div>`;
@@ -970,8 +1057,14 @@ function renderToday() {
     <div class="card">
       <h2>${isToday(state.currentDate) ? '오늘' : '이 날'} 요약</h2>
       <div class="stat-big">
-        <span class="num ${pctClass}">${totals.kcal}</span><span class="unit">/ ${target} kcal</span>
-        <div class="sub">${totals.count}개 항목 · ${pct}% ${pct>105?'초과':pct>=95?'목표':'미달'}</div>
+        <span class="num ${pctClass}">${totals.net}</span><span class="unit">/ ${target} kcal</span>
+        <div class="sub">
+          섭취 <b style="color:var(--primary)">${totals.consumed}</b>
+          − 소모 <b style="color:var(--success)">${totals.burned}</b>
+          = 순 <b>${totals.net}</b>
+          · ${pct}% ${pct>105?'초과':pct>=95?'목표':'미달'}
+        </div>
+        <div class="sub" style="margin-top:2px">${totals.foodCount}개 음식 · ${totals.exerciseCount}개 운동</div>
       </div>
       <div class="progress-bar">
         <div class="fill ${pctClass}" style="width: ${Math.min(pct, 150)}%"></div>
@@ -1017,26 +1110,45 @@ function renderToday() {
       <h2>기록 (${entries.length})</h2>
       <div id="entries-list">
         ${entries.length === 0 ? '<div class="empty-list">아직 기록 없음</div>' :
-          entries.map((e, i) => `
-            <div class="entry-item">
-              <div class="info">
-                <div class="entry-header">
-                  <span class="time">${e.time || ''}${e.source === 'photo' ? ' · 📷' : ''}${e.confidence === 'low' ? ' · ⚠ 신뢰도 낮음' : ''}</span>
-                  <button class="delete-btn" onclick="deleteEntry(${i})" title="삭제">×</button>
+          entries.map((e, i) => {
+            const type = e.type || 'food';
+            if (type === 'exercise') {
+              return `
+                <div class="entry-item entry-exercise">
+                  <div class="info">
+                    <div class="entry-header">
+                      <span class="time">${e.time || ''} · 🏃${e.confidence === 'low' ? ' · ⚠ 신뢰도 낮음' : ''}</span>
+                      <button class="delete-btn" onclick="deleteEntry(${i})" title="삭제">×</button>
+                    </div>
+                    <div class="entry-name">${escapeHtml(e.name)} <span style="color:var(--muted);font-weight:400">· ${escapeHtml(e.amount)}</span></div>
+                    <div class="entry-macros-line">
+                      <span class="mac-burned">−${e.kcal} kcal 소모</span>
+                      ${e.duration_min ? `<span class="mac-sep">·</span><span style="color:var(--muted)">${e.duration_min}분</span>` : ''}
+                    </div>
+                  </div>
+                </div>`;
+            }
+            return `
+              <div class="entry-item">
+                <div class="info">
+                  <div class="entry-header">
+                    <span class="time">${e.time || ''}${e.source === 'photo' ? ' · 📷' : ''}${e.confidence === 'low' ? ' · ⚠ 신뢰도 낮음' : ''}</span>
+                    <button class="delete-btn" onclick="deleteEntry(${i})" title="삭제">×</button>
+                  </div>
+                  <div class="entry-name">${escapeHtml(e.name)} <span style="color:var(--muted);font-weight:400">· ${escapeHtml(e.amount)}</span></div>
+                  <div class="entry-macros-line">
+                    <span class="mac-kcal">${e.kcal} kcal</span>
+                    <span class="mac-sep">(</span>
+                    <span class="mac-carbs">탄 ${e.carbs_g}g</span>
+                    <span class="mac-sep">·</span>
+                    <span class="mac-protein">단 ${e.protein_g}g</span>
+                    <span class="mac-sep">·</span>
+                    <span class="mac-fat">지 ${e.fat_g}g</span>
+                    <span class="mac-sep">)</span>
+                  </div>
                 </div>
-                <div class="entry-name">${escapeHtml(e.name)} <span style="color:var(--muted);font-weight:400">· ${escapeHtml(e.amount)}</span></div>
-                <div class="entry-macros-line">
-                  <span class="mac-kcal">${e.kcal} kcal</span>
-                  <span class="mac-sep">(</span>
-                  <span class="mac-carbs">탄 ${e.carbs_g}g</span>
-                  <span class="mac-sep">·</span>
-                  <span class="mac-protein">단 ${e.protein_g}g</span>
-                  <span class="mac-sep">·</span>
-                  <span class="mac-fat">지 ${e.fat_g}g</span>
-                  <span class="mac-sep">)</span>
-                </div>
-              </div>
-            </div>`).join('')}
+              </div>`;
+          }).join('')}
       </div>
     </div>`;
 
@@ -1057,14 +1169,17 @@ function renderPreview() {
   const cont = document.getElementById('preview-container');
   if (!cont || !state.pendingFood) return;
   const f = state.pendingFood;
+  const isExercise = f.type === 'exercise';
   cont.innerHTML = `
     <div class="preview-card">
-      <div class="name">${escapeHtml(f.name)}${f.confidence === 'low' ? ' ⚠' : ''}</div>
-      <div class="amount">${escapeHtml(f.amount)} · <b>${f.kcal} kcal</b></div>
+      <div class="name">${isExercise ? '🏃 ' : ''}${escapeHtml(f.name)}${f.confidence === 'low' ? ' ⚠' : ''}</div>
+      <div class="amount">${escapeHtml(f.amount)} · <b>${isExercise ? `−${f.kcal} kcal 소모` : `${f.kcal} kcal`}</b></div>
       <div class="macros">
-        <span style="color:var(--carbs)">탄 ${f.carbs_g}g</span>
-        <span style="color:var(--protein)">단 ${f.protein_g}g</span>
-        <span style="color:var(--fat)">지 ${f.fat_g}g</span>
+        ${isExercise
+          ? `<span style="color:var(--success)">${f.duration_min || '?'}분 운동</span>`
+          : `<span style="color:var(--carbs)">탄 ${f.carbs_g}g</span>
+             <span style="color:var(--protein)">단 ${f.protein_g}g</span>
+             <span style="color:var(--fat)">지 ${f.fat_g}g</span>`}
         <span style="color:var(--muted);margin-left:auto">신뢰도: ${f.confidence}</span>
       </div>
       <div class="preview-actions">
@@ -1364,6 +1479,26 @@ async function onAnalyzePhoto() {
   }
 }
 
+async function onAnalyzeExercise() {
+  const inp = document.getElementById('exercise-text');
+  const text = (inp?.value || '').trim();
+  if (!text) return toast('운동을 입력하세요', 'error');
+  const btn = document.getElementById('analyze-exercise-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loader"></span>분석 중';
+  try {
+    const ex = await analyzeExercise(text);
+    state.pendingFood = { ...ex, type: 'exercise', source: 'exercise' };
+    renderPreview();
+    toast('분석 완료 — 확인 후 저장', 'success');
+  } catch (e) {
+    toast('분석 실패: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '분석';
+  }
+}
+
 function cancelPending() {
   state.pendingFood = null;
   renderToday();
@@ -1373,14 +1508,17 @@ async function saveEntry() {
   if (!state.pendingFood) return;
   const now = new Date();
   const time = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const type = state.pendingFood.type || 'food';
   const entry = {
     time,
+    type,
     name: state.pendingFood.name,
     amount: state.pendingFood.amount,
     kcal: Number(state.pendingFood.kcal) || 0,
     carbs_g: Number(state.pendingFood.carbs_g) || 0,
     protein_g: Number(state.pendingFood.protein_g) || 0,
     fat_g: Number(state.pendingFood.fat_g) || 0,
+    duration_min: Number(state.pendingFood.duration_min) || 0,
     confidence: state.pendingFood.confidence,
     source: state.pendingFood.source,
     createdAt: now.toISOString()
