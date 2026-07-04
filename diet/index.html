@@ -845,6 +845,61 @@ MET(Metabolic Equivalent of Task) 값과 체중을 사용해 소모 칼로리 �
   return JSON.parse(content);
 }
 
+async function analyzeExercisePhoto(base64, mimeType, hint) {
+  if (!state.settings.geminiKey) throw new Error('Gemini API 키가 설정되지 않음');
+  const kg = state.data.profile.currentKg;
+  const hintBlock = (hint && hint.trim())
+    ? `\n\n사용자 추가 힌트: "${hint.trim()}"\n힌트를 참고하여 스크린샷을 해석하세요.`
+    : '';
+  const prompt = `당신은 운동 앱 스크린샷 (스트라바, 나이키 러닝, 애플 헬스, 삼성 헬스, 트레드밀 계기판 등) 에서 운동 정보와 소모 칼로리를 추출/계산하는 전문가입니다.
+
+사용자 체중: ${kg} kg${hintBlock}
+
+이 스크린샷을 분석해서 운동 정보를 추출하세요:
+- 스크린샷에 표시된 소모 칼로리(kcal, cal, 열량)가 있으면 **그 값을 그대로 사용**
+- 표시된 값이 없으면 MET × 체중 × 시간으로 계산
+- 운동 종류/시간/거리/페이스/앱 이름 등 알 수 있는 모든 정보 활용
+
+MET 참고값:
+- 걷기 3.5 · 조깅 6-8 · 러닝 9-10 · 자전거 8 · 웨이트 3.5-6
+- 수영 6-10 · 요가 3 · HIIT 8-10 · 등산 6-8
+
+정확히 아래 JSON 스키마로만 응답:
+{
+  "name": "운동 이름 (앱/기기 이름 포함 가능. 예: '스트라바 러닝', '트레드밀 조깅')",
+  "amount": "요약 (예: '10.2km 45분 5:20/km', '30분 트레드밀 8km/h')",
+  "kcal": 소모 칼로리 (양수 정수. 스크린샷 표시값이 있으면 그 값 우선),
+  "duration_min": 대략 소요 분 (정수),
+  "confidence": "high" (스크린샷에 kcal 명시된 경우) | "medium" (계산) | "low"
+}
+마크다운 없이 JSON만.`;
+
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(state.settings.geminiKey)}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            { text: prompt },
+            { inline_data: { mime_type: mimeType, data: base64 } }
+          ]
+        }],
+        generationConfig: { responseMimeType: 'application/json', temperature: 0.2 }
+      })
+    }
+  );
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Gemini ${res.status}: ${err.slice(0, 150)}`);
+  }
+  const data = await res.json();
+  const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!content) throw new Error('Gemini 응답 없음');
+  return JSON.parse(content);
+}
+
 // ---------- Nutrition Math ----------
 function calculateBMR(profile) {
   const { gender, age, height_cm, currentKg } = profile;
@@ -1046,9 +1101,12 @@ function renderToday() {
       ` : `
         <div class="input-row">
           <input type="text" id="exercise-text" placeholder="예: 조깅 30분, 자전거 1시간, 웨이트 45분" />
+          <label for="exercise-photo" class="btn btn-secondary" title="사진 첨부" style="padding:10px 12px;cursor:pointer;font-size:16px">📎</label>
+          <input type="file" id="exercise-photo" accept="image/*" onchange="onExercisePhotoSelected(event)" style="display:none" />
           <button class="btn" id="analyze-exercise-btn" onclick="onAnalyzeExercise()">분석</button>
         </div>
-        <div class="help-text">운동 이름과 시간(강도)를 입력하세요. 체중(${state.data.profile.currentKg}kg) × MET × 시간으로 소모 kcal 계산.</div>
+        <div id="exercise-photo-wrap"></div>
+        <div class="help-text">텍스트 입력 또는 운동 앱 스크린샷 📎 첨부. 둘 다 있으면 사진 우선 + 텍스트를 힌트로 사용. 체중(${state.data.profile.currentKg}kg) 반영.</div>
       `}
       <div id="preview-container"></div>
     </div>`;
@@ -1156,6 +1214,7 @@ function renderToday() {
   drawPieChart(document.getElementById('pie-container'), totals.carbs, totals.protein, totals.fat);
   if (state.pendingFood) renderPreview();
   if (state.pendingPhotoBase64 && state.inputMode === 'photo') renderPhotoPreview();
+  if (state.pendingPhotoBase64 && state.inputMode === 'exercise') renderExercisePhotoPreview();
 }
 
 function renderPhotoPreview() {
@@ -1479,16 +1538,56 @@ async function onAnalyzePhoto() {
   }
 }
 
+function onExercisePhotoSelected(e) {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const dataUrl = reader.result;
+    const commaIdx = dataUrl.indexOf(',');
+    state.pendingPhotoBase64 = dataUrl.slice(commaIdx + 1);
+    state.pendingPhotoMime = dataUrl.slice(5, dataUrl.indexOf(';'));
+    renderExercisePhotoPreview();
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderExercisePhotoPreview() {
+  const wrap = document.getElementById('exercise-photo-wrap');
+  if (!wrap) return;
+  if (!state.pendingPhotoBase64) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = `
+    <div style="position:relative;margin-top:8px">
+      <img class="photo-preview" src="data:${state.pendingPhotoMime};base64,${state.pendingPhotoBase64}" />
+      <button class="btn btn-secondary" onclick="clearExercisePhoto()" style="margin-top:6px">✕ 사진 제거</button>
+    </div>`;
+}
+
+function clearExercisePhoto() {
+  state.pendingPhotoBase64 = null;
+  state.pendingPhotoMime = null;
+  const inp = document.getElementById('exercise-photo');
+  if (inp) inp.value = '';
+  renderExercisePhotoPreview();
+}
+
 async function onAnalyzeExercise() {
   const inp = document.getElementById('exercise-text');
   const text = (inp?.value || '').trim();
-  if (!text) return toast('운동을 입력하세요', 'error');
+  const hasPhoto = !!state.pendingPhotoBase64;
+  if (!text && !hasPhoto) return toast('텍스트나 사진 중 하나는 필요합니다', 'error');
   const btn = document.getElementById('analyze-exercise-btn');
   btn.disabled = true;
   btn.innerHTML = '<span class="loader"></span>분석 중';
   try {
-    const ex = await analyzeExercise(text);
-    state.pendingFood = { ...ex, type: 'exercise', source: 'exercise' };
+    let ex;
+    if (hasPhoto) {
+      ex = await analyzeExercisePhoto(state.pendingPhotoBase64, state.pendingPhotoMime, text);
+      state.pendingFood = { ...ex, type: 'exercise', source: 'photo', hint: text || undefined };
+    } else {
+      ex = await analyzeExercise(text);
+      state.pendingFood = { ...ex, type: 'exercise', source: 'exercise' };
+    }
     renderPreview();
     toast('분석 완료 — 확인 후 저장', 'success');
   } catch (e) {
