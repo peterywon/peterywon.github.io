@@ -910,22 +910,43 @@ function calculateMaintenance(profile) {
   return calculateBMR(profile) * (ACTIVITY_FACTORS[profile.activity] || 1.2);
 }
 function calculateRecommendation(profile) {
-  const maintenance = calculateMaintenance(profile);
+  // Net kcal mode: target is based on sedentary baseline (BMR × 1.2).
+  // Logged exercise is subtracted from consumed → net vs target.
+  // This avoids double-counting activity that's already baked into higher factors.
+  const bmr = calculateBMR(profile);
+  const sedentaryMaintenance = bmr * ACTIVITY_FACTORS.sedentary;
+  const activityMaintenance = bmr * (ACTIVITY_FACTORS[profile.activity] || 1.2);
   const kgToLose = profile.currentKg - profile.goalKg;
   if (kgToLose <= 0) {
-    return { maintenance, recommended: Math.round(maintenance), note: '유지 또는 벌크 모드', bmr: calculateBMR(profile), kgToLose };
+    return {
+      bmr: Math.round(bmr),
+      maintenance: Math.round(sedentaryMaintenance),
+      activityMaintenance: Math.round(activityMaintenance),
+      recommended: Math.round(sedentaryMaintenance),
+      note: '유지 또는 벌크 모드',
+      kgToLose
+    };
   }
   const totalDeficit = kgToLose * KCAL_PER_KG_FAT;
   const dailyDeficit = totalDeficit / profile.targetDays;
-  let recommended = maintenance - dailyDeficit;
+  let recommended = sedentaryMaintenance - dailyDeficit;
   const minSafe = profile.gender === 'male' ? 1500 : 1200;
-  let note = `일일 부족: ${Math.round(dailyDeficit)} kcal (주 감량 ${(kgToLose / profile.targetDays * 7).toFixed(2)}kg)`;
+  let note;
   if (recommended < minSafe) {
-    const adjustedDays = Math.ceil(totalDeficit / (maintenance - minSafe));
+    const adjustedDays = Math.ceil(totalDeficit / (sedentaryMaintenance - minSafe));
     recommended = minSafe;
-    note = `⚠ 안전 최소값(${minSafe})으로 조정. 목표 달성 예상: ${adjustedDays}일`;
+    note = `⚠ 안전 최소값(${minSafe})으로 조정. 예상 도달: ${adjustedDays}일 (운동 없을 때). 운동하면 더 빨라짐.`;
+  } else {
+    note = `일일 순 kcal 목표 · 주 감량 ${(kgToLose / profile.targetDays * 7).toFixed(2)}kg · 운동은 여유분으로 사용`;
   }
-  return { maintenance: Math.round(maintenance), recommended: Math.round(recommended), note, bmr: Math.round(calculateBMR(profile)), kgToLose };
+  return {
+    bmr: Math.round(bmr),
+    maintenance: Math.round(sedentaryMaintenance),
+    activityMaintenance: Math.round(activityMaintenance),
+    recommended: Math.round(recommended),
+    note,
+    kgToLose
+  };
 }
 function getDailyTotals(date) {
   const entries = state.data.entries[date] || [];
@@ -1379,11 +1400,17 @@ function renderGoal() {
       <button class="btn" onclick="saveProfileFromForm()" style="width:100%;margin-top:8px">저장 + 계산</button>
 
       <div class="goal-result">
+        <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:10px;margin-bottom:12px;font-size:12px;line-height:1.6;color:#075985">
+          <b>🎯 순 kcal 모드</b><br>
+          목표는 <b>운동 안 할 때 하한선</b>으로 설정됨. 운동 로그하면 그만큼 더 먹을 여유 생김.<br>
+          비교 대상: <b>순 kcal = 섭취 − 소모</b>
+        </div>
         <div class="stat-row"><span class="stat-label">기초대사량 (BMR)</span><span class="stat-value">${rec.bmr} kcal</span></div>
-        <div class="stat-row"><span class="stat-label">유지 칼로리</span><span class="stat-value">${rec.maintenance} kcal</span></div>
+        <div class="stat-row"><span class="stat-label">유지 (sedentary 기준)</span><span class="stat-value">${rec.maintenance} kcal</span></div>
+        <div class="stat-row"><span class="stat-label" style="color:var(--muted)">참고: 활동량 반영 TDEE</span><span class="stat-value" style="color:var(--muted);font-weight:500">${rec.activityMaintenance} kcal</span></div>
         <div class="stat-row"><span class="stat-label">감량 목표</span><span class="stat-value">${rec.kgToLose.toFixed(1)} kg / ${p.targetDays}일</span></div>
         <div class="big-num">${rec.recommended} kcal</div>
-        <div class="note">권장 일일 섭취 · ${rec.note}</div>
+        <div class="note">권장 순 kcal 목표 · ${rec.note}</div>
       </div>
     </div>`;
 }
