@@ -6,10 +6,13 @@
     "authors": "Green, Li & Papanikolaou",
     "journal": "Working paper",
     "year": "2026",
+    "area": "FinTech, AI & Data",
+    "subarea": "AI / ML in finance",
     "date": "2026-08-19",
-    "takeaway": "AI-PDR (how digitally-deliverable a firm's products are, scored from 10-K text by an LLM) predicts ~10pp lower CARs when Anthropic's open-source Cowork Plugins launched targeted agents; general model releases (ChatGPT, Opus 4.5) don't reprice it.",
-    "best": "Sharp identification of *when* the market prices product-displacement risk — only the product-targeting release moves prices, and supply-side shields (moats/regulation) attenuate the effect ~37%.",
-    "idea": "Cowork Plugins are open-source complements — this is 'commoditize your complement' at the product level. Pair AI-PDR with my OSS-release / Data Power setting: does a platform's open-source AI push transfer value away from high-deliverability complement firms?",
+    "rq": "Do equity investors price the risk that a firm's *product* (not its labor) is displaced by generative AI — and when does the market react?",
+    "finding": "AI-PDR (products' digital deliverability, LLM-scored from 10-Ks) predicts ~10pp lower CARs at the open-source Cowork Plugins launch; general model releases don't reprice it; supply-side shields attenuate ~37%.",
+    "remember": "Cowork Plugins = open-source complements → 'commoditize your complement' at the product level. Pair AI-PDR with my OSS-release / Data-Power setting; event targets products, not just capability.",
+    "contribution": "incredible",
     "ts": "2026-08-19T00:00:00Z"
   },
   {
