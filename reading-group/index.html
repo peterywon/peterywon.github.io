@@ -64,6 +64,16 @@
   ol.guide li{margin:6px 0;}
   a.btnlink{display:inline-block;font-family:"Inter",sans-serif;font-size:.82rem;font-weight:600;text-decoration:none;
     background:#111;color:#fff;padding:8px 13px;border-radius:8px;margin:2px 0 8px;}
+  #insights{display:none;}
+  .tiles{display:flex;gap:12px;flex-wrap:wrap;margin:2px 0 20px;font-family:"Inter",sans-serif;}
+  .tile{flex:1 1 110px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:11px 14px;}
+  .tile .v{font-size:1.55rem;font-weight:700;line-height:1.1;}
+  .tile .k{font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-top:2px;}
+  .section-title{font-family:"Inter",sans-serif;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:20px 0 8px;}
+  .graphwrap,.cloud{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:0 0 12px;}
+  .cloud{line-height:2;}
+  .cloud h3{font-family:"Inter",sans-serif;font-size:.76rem;text-transform:uppercase;letter-spacing:.06em;margin:0 0 6px;}
+  .cloud .w{display:inline-block;margin:1px 9px 1px 0;font-weight:600;}
 </style>
 </head>
 <body>
@@ -74,6 +84,7 @@
   <div class="bar">
     <input id="q" type="search" placeholder="Search papers, takeaways, ideas&hellip;">
     <button class="primary" id="addBtn">&#43; Add entry</button>
+    <button id="viewBtn">&#128202; Insights</button>
     <button id="refreshBtn">&#8635; Refresh</button>
     <button class="ghost" id="tokenBtn">&#128273; Token</button>
   </div>
@@ -82,6 +93,8 @@
     <div class="col peter"><h2>Peter <span class="n" id="nPeter"></span></h2><div id="colPeter"></div></div>
     <div class="col hanjun"><h2>Hanjun <span class="n" id="nHanjun"></span></h2><div id="colHanjun"></div></div>
   </div>
+
+  <div id="insights"></div>
 
   <p class="note" id="foot" style="margin-top:26px"></p>
 </div>
@@ -118,25 +131,24 @@
     <b>this browser</b> and sent only to <code>api.github.com</code>.</p>
 
     <ol class="guide">
-      <li>Open the GitHub token page below and sign in.</li>
-      <li><b>Token name:</b> anything (e.g. &ldquo;reading-group&rdquo;). Set an expiration you like.</li>
-      <li><b>Repository access</b> &rarr; <b>Only select repositories</b> &rarr; choose <code>peterywon.github.io</code>.</li>
-      <li><b>Permissions</b> &rarr; <b>Repository permissions</b> &rarr; <b>Contents</b> &rarr; <b>Read and write</b>.</li>
+      <li>Have a GitHub account, and be a <b>collaborator</b> on this repo. <span class="note">Second person: the owner adds you in repo <b>Settings &rarr; Collaborators</b>, and you accept the invite (check email / github.com notifications).</span></li>
+      <li>Open the token page below (it pre-checks the right scope) and sign in.</li>
+      <li>Set a <b>Note</b> and an expiration. Confirm <b>repo &rarr; public_repo</b> is checked.</li>
       <li>Click <b>Generate token</b>, copy it, paste below, and Save.</li>
     </ol>
 
-    <a class="btnlink" href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Open GitHub token page &#8599;</a>
+    <a class="btnlink" href="https://github.com/settings/tokens/new?scopes=public_repo&amp;description=reading-group-archive" target="_blank" rel="noopener">Create a classic token &#8599;</a>
 
-    <label>Paste token <span class="note">(starts with <code>github_pat_</code>)</span></label>
-    <input id="f_token" type="password" placeholder="github_pat_&hellip;">
+    <label>Paste token <span class="note">(a classic token, starts with <code>ghp_</code>)</span></label>
+    <input id="f_token" type="password" placeholder="ghp_&hellip;">
     <div class="msg" id="tokenMsg"></div>
     <div class="actions">
       <button id="tokenClear" class="ghost">Clear</button>
       <button id="tokenCancel">Cancel</button>
       <button class="primary" id="tokenSave">Save token</button>
     </div>
-    <p class="note" style="margin-top:14px"><b>Second person (Hanjun):</b> the repo owner adds you as a
-    <b>collaborator</b> (repo Settings &rarr; Collaborators &amp; teams) first &mdash; then make your own token the same way.
+    <p class="note" style="margin-top:14px">Use a <b>classic</b> token with the <code>public_repo</code> scope &mdash; a
+    fine-grained token cannot reach a collaborator&rsquo;s repo, which is why &ldquo;Only select repositories&rdquo; was empty.
     The archive is a <b>public</b> file.</p>
   </div>
 </div>
@@ -252,6 +264,80 @@ $("addSave").onclick=async()=>{
   }catch(e){$("addMsg").className="msg err";$("addMsg").textContent=e.message;}
   finally{$("addSave").disabled=false;}
 };
+
+// ---------- Insights ----------
+const STOP=new Set(("the a an and or but of to in on for with as at by is are was were be been it this that these those from into "+
+"than then when how what which who about can could would should do does did not no more most less very just also i we you they he she "+
+"its their our my me us them if so such per via using use used paper papers study studies result results finding findings effect effects "+
+"show shows shown find finds found author authors question contribution method methods data model models evidence analysis approach new one "+
+"two three each between across within over under after before during because however whether make made makes get gets got like well good best "+
+"thing things idea ideas take takeaway does out up down only than there here").split(/\s+/));
+function tokens(s){return (s||"").toLowerCase().replace(/[^a-z0-9\s-]/g," ").split(/\s+/)
+  .map(w=>w.replace(/^-+|-+$/g,"")).filter(w=>w.length>=3&&!STOP.has(w))
+  .map(w=>(w.length>4&&w.endsWith("s")&&!w.endsWith("ss"))?w.slice(0,-1):w);}
+function entryText(e){return [e.idea,e.takeaway,e.best,e.paper].join(" ");}
+
+function computeInsights(){
+  const el=$("insights");
+  if(!ENTRIES.length){el.innerHTML='<div class="empty">No entries yet — add a few and insights will appear here.</div>';return;}
+  const freq={Peter:{},Hanjun:{},all:{}}, nodePerson={};
+  ENTRIES.forEach(e=>{const who=freq[e.author]?e.author:null;
+    [...new Set(tokens(entryText(e)))].forEach(w=>{freq.all[w]=(freq.all[w]||0)+1;
+      if(who)freq[who][w]=(freq[who][w]||0)+1;
+      nodePerson[w]=nodePerson[w]||{Peter:0,Hanjun:0}; if(who)nodePerson[w][who]++;});});
+  const byMonth={}; ENTRIES.forEach(e=>{const m=(e.date||"").slice(0,7); if(m)byMonth[m]=(byMonth[m]||0)+1;});
+  const tiles=[["Papers",ENTRIES.length],["Peter",ENTRIES.filter(e=>e.author==="Peter").length],
+    ["Hanjun",ENTRIES.filter(e=>e.author==="Hanjun").length],
+    ["This month",byMonth[new Date().toISOString().slice(0,7)]||0],["Keywords",Object.keys(freq.all).length]];
+  const cloud=who=>{const arr=Object.entries(freq[who]).sort((a,b)=>b[1]-a[1]).slice(0,28);
+    if(!arr.length)return '<div class="empty">No keywords yet.</div>';
+    const max=arr[0][1], col=who==="Peter"?"var(--peter)":"var(--hanjun)";
+    return arr.map(([w,c])=>{const sz=13+Math.round(20*Math.sqrt(c/max));
+      return `<span class="w" style="font-size:${sz}px;color:${col};opacity:${(0.55+0.45*c/max).toFixed(2)}" title="${c}">${esc(w)}</span>`;}).join("");};
+  const top=Object.entries(freq.all).sort((a,b)=>b[1]-a[1]).slice(0,20).map(x=>x[0]);
+  const idx=new Map(top.map((w,i)=>[w,i]));
+  const nodes=top.map(w=>({w,freq:freq.all[w],P:nodePerson[w].Peter,H:nodePerson[w].Hanjun}));
+  const pairs={};
+  ENTRIES.forEach(e=>{const ts=[...new Set(tokens(entryText(e)))].filter(w=>idx.has(w));
+    for(let i=0;i<ts.length;i++)for(let j=i+1;j<ts.length;j++){const k=[ts[i],ts[j]].sort().join("|");pairs[k]=(pairs[k]||0)+1;}});
+  const edges=Object.entries(pairs).map(([k,w])=>{const[x,y]=k.split("|");return{a:idx.get(x),b:idx.get(y),w};})
+    .sort((a,b)=>b.w-a.w).slice(0,32);
+  el.innerHTML='<div class="tiles">'+tiles.map(t=>`<div class="tile"><div class="v">${t[1]}</div><div class="k">${t[0]}</div></div>`).join("")+'</div>'
+    +'<div class="section-title">Keyword map &mdash; ideas that show up together</div><div class="graphwrap">'+graphSVG(nodes,edges)+'</div>'
+    +'<div class="section-title">Most frequent keywords</div>'
+    +'<div class="cloud"><h3 style="color:var(--peter)">Peter</h3>'+cloud("Peter")+'</div>'
+    +'<div class="cloud"><h3 style="color:var(--hanjun)">Hanjun</h3>'+cloud("Hanjun")+'</div>';
+}
+function graphSVG(nodes,edges){
+  if(nodes.length<2)return '<div class="empty" style="padding:14px">Add more entries to grow the keyword map.</div>';
+  const W=900,H=380,cx=W/2,cy=H/2,R=Math.min(W,H)/2-46;
+  nodes.forEach((n,i)=>{const a=2*Math.PI*i/nodes.length;n.x=cx+R*Math.cos(a);n.y=cy+R*Math.sin(a);n.vx=0;n.vy=0;});
+  for(let it=0;it<220;it++){
+    for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){
+      let dx=nodes[i].x-nodes[j].x,dy=nodes[i].y-nodes[j].y,d2=dx*dx+dy*dy+0.01,d=Math.sqrt(d2),f=2600/d2,fx=f*dx/d,fy=f*dy/d;
+      nodes[i].vx+=fx;nodes[i].vy+=fy;nodes[j].vx-=fx;nodes[j].vy-=fy;}
+    edges.forEach(e=>{const a=nodes[e.a],b=nodes[e.b];let dx=b.x-a.x,dy=b.y-a.y,d=Math.sqrt(dx*dx+dy*dy)+0.01,f=(d-110)*0.02*Math.min(3,e.w),fx=f*dx/d,fy=f*dy/d;
+      a.vx+=fx;a.vy+=fy;b.vx-=fx;b.vy-=fy;});
+    nodes.forEach(n=>{n.vx+=(cx-n.x)*0.003;n.vy+=(cy-n.y)*0.003;
+      n.x+=Math.max(-9,Math.min(9,n.vx));n.y+=Math.max(-9,Math.min(9,n.vy));n.vx*=0.84;n.vy*=0.84;
+      n.x=Math.max(44,Math.min(W-44,n.x));n.y=Math.max(28,Math.min(H-24,n.y));});}
+  const maxf=Math.max.apply(null,nodes.map(n=>n.freq));
+  const col=n=>n.P>n.H?"#8b1a1a":n.H>n.P?"#1a4a8b":"#8a6d3b";
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:100%;height:auto;font-family:Inter,sans-serif">`;
+  edges.forEach(e=>{const a=nodes[e.a],b=nodes[e.b];
+    s+=`<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}" stroke="#c9ccd0" stroke-width="${Math.min(3,0.6+e.w*0.6).toFixed(1)}" stroke-opacity="0.7"/>`;});
+  nodes.forEach(n=>{const r=6+Math.round(12*Math.sqrt(n.freq/maxf));
+    s+=`<circle cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="${r}" fill="${col(n)}" fill-opacity="0.85"/>`;
+    s+=`<text x="${n.x.toFixed(1)}" y="${(n.y-r-4).toFixed(1)}" text-anchor="middle" font-size="12" fill="#1c1c1c">${esc(n.w)}</text>`;});
+  return s+`</svg>`;}
+let VIEW="board";
+function showView(v){VIEW=v;
+  $("board").style.display=v==="board"?"":"none";
+  $("insights").style.display=v==="insights"?"block":"none";
+  $("q").style.display=v==="board"?"":"none";
+  $("viewBtn").innerHTML=v==="board"?"&#128202; Insights":"&#9776; Boards";
+  if(v==="insights")computeInsights();}
+$("viewBtn").onclick=()=>showView(VIEW==="board"?"insights":"board");
 
 (async function init(){
   $("foot").innerHTML='Data lives in <code>reading-group/entries.json</code> in the '+
