@@ -280,6 +280,8 @@ function closeToken(){$("tokenScrim").classList.remove("on");}
 $("addBtn").onclick=openAdd; $("addCancel").onclick=closeAdd;
 $("f_author").onchange=()=>{const nw=$("f_author").value==="__new__";$("f_authorNew").style.display=nw?"block":"none";if(nw)$("f_authorNew").focus();};
 $("tokenBtn").onclick=openToken; $("tokenCancel").onclick=closeToken;
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ closeAdd(); closeToken(); } });
+[$("addScrim"),$("tokenScrim")].forEach(s=>s.addEventListener("click",e=>{ if(e.target===s){ closeAdd(); closeToken(); } }));
 $("viewBtn").onclick=()=>showView(VIEW==="board"?"insights":"board");
 $("refreshBtn").onclick=async()=>{try{await loadFile();refreshView();}catch(e){alert(e.message);}};
 $("q").oninput=renderBoards;
