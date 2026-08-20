@@ -2,7 +2,10 @@
   {
     "id": "green-aipdr-2026",
     "author": "Peter",
-    "paper": "Green, Li & Papanikolaou (2026) — Generative AI Product Displacement Risk (WP)",
+    "title": "Generative AI Product Displacement Risk",
+    "authors": "Green, Li & Papanikolaou",
+    "journal": "Working paper",
+    "year": "2026",
     "date": "2026-08-19",
     "takeaway": "AI-PDR (how digitally-deliverable a firm's products are, scored from 10-K text by an LLM) predicts ~10pp lower CARs when Anthropic's open-source Cowork Plugins launched targeted agents; general model releases (ChatGPT, Opus 4.5) don't reprice it.",
     "best": "Sharp identification of *when* the market prices product-displacement risk — only the product-targeting release moves prices, and supply-side shields (moats/regulation) attenuate the effect ~37%.",

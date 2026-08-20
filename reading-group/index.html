@@ -86,8 +86,14 @@
     <label>Who</label>
     <select id="f_author"></select>
     <input id="f_authorNew" style="display:none;margin-top:8px" placeholder="Type the new name">
-    <label>Paper <span class="note">(title / journal / year)</span></label>
-    <input id="f_paper" placeholder="e.g., Investor Attention and Return Predictability (JF, 2025)">
+    <label>Title</label>
+    <input id="f_title" placeholder="e.g., Investor Attention and Return Predictability">
+    <label>Authors</label>
+    <input id="f_authors" placeholder="e.g., Smith &amp; Lee">
+    <div style="display:flex;gap:10px">
+      <div style="flex:2 1 0"><label>Journal / venue</label><input id="f_journal" placeholder="JF, RFS, WP, SSRN…"></div>
+      <div style="flex:1 1 0"><label>Year</label><input id="f_year" placeholder="2025"></div>
+    </div>
     <label>Date read</label>
     <input id="f_date" type="date">
     <label>One-line takeaway</label>
@@ -171,19 +177,22 @@ async function commit(next,message){
     throw new Error("Save failed: "+m);}
   const j=await r.json();SHA=j.content.sha;ENTRIES=next;
 }
-async function saveEntry(entry){await loadFile();await commit(ENTRIES.concat([entry]),`archive: ${entry.author} — ${entry.paper}`);}
+async function saveEntry(entry){await loadFile();await commit(ENTRIES.concat([entry]),`archive: ${entry.author} — ${entry.title||entry.paper}`);}
 async function deleteEntry(id){await loadFile();await commit(ENTRIES.filter(e=>e.id!==id),`archive: delete ${id}`);}
 
 // ---- boards ----
 function card(e){
   const row=(lab,v)=>v?`<div class="row"><b>${lab}</b>${esc(v)}</div>`:"";
+  const title=e.title||e.paper||"";
+  const meta=[e.authors,[e.journal,e.year].filter(Boolean).join(" ")].filter(Boolean).join(" · ");
+  const dt=[meta,e.date?"read "+e.date:""].filter(Boolean).join(" · ");
   return `<div class="card"><button class="del" data-id="${esc(e.id)}" title="Delete this entry">&times;</button>
-    <div class="pp">${esc(e.paper)}</div><div class="dt">${esc(e.date||"")}</div>
+    <div class="pp">${esc(title)}</div>${dt?`<div class="dt">${esc(dt)}</div>`:""}
     ${row("Takeaway",e.takeaway)}${row("Best thing",e.best)}${row("Idea / question",e.idea)}</div>`;
 }
 function renderBoards(){
   const q=($("q").value||"").toLowerCase().trim();
-  const match=e=>!q||[e.paper,e.takeaway,e.best,e.idea,e.author].some(x=>(x||"").toLowerCase().includes(q));
+  const match=e=>!q||[e.title,e.authors,e.journal,e.year,e.paper,e.takeaway,e.best,e.idea,e.author].some(x=>(x||"").toLowerCase().includes(q));
   $("board").innerHTML=memberList().map(m=>{
     const list=ENTRIES.filter(e=>e.author===m.name&&match(e)).sort(byDate);
     return `<div class="col"><h2 style="color:${m.color};border-color:${m.color}">${esc(m.name)} <span class="n">${list.length||""}</span></h2>`
@@ -196,7 +205,7 @@ const STOP=new Set(("the a an and or but of to in on for with as at by is are wa
 function tokens(s){return (s||"").toLowerCase().replace(/[^a-z0-9\s-]/g," ").split(/\s+/)
   .map(w=>w.replace(/^-+|-+$/g,"")).filter(w=>w.length>=3&&!STOP.has(w))
   .map(w=>(w.length>4&&w.endsWith("s")&&!w.endsWith("ss"))?w.slice(0,-1):w);}
-function entryText(e){return [e.idea,e.takeaway,e.best,e.paper].join(" ");}
+function entryText(e){return [e.idea,e.takeaway,e.best,e.title,e.authors,e.journal,e.paper].join(" ");}
 
 function buildGraph(entries,opts){
   opts=opts||{};const N=opts.N||18,W=opts.W||900,H=opts.H||360,E=opts.E||30;
@@ -297,17 +306,18 @@ $("board").addEventListener("click",async(ev)=>{
 });
 
 $("addSave").onclick=async()=>{
-  const paper=$("f_paper").value.trim();
+  const title=$("f_title").value.trim();
   const author=($("f_author").value==="__new__"?$("f_authorNew").value.trim():$("f_author").value);
   if(!author){$("addMsg").className="msg err";$("addMsg").textContent="Please choose or type a name.";return;}
-  if(!paper){$("addMsg").className="msg err";$("addMsg").textContent="Paper is required.";return;}
-  const entry={id:"e"+Date.now().toString(36),author,paper,
+  if(!title){$("addMsg").className="msg err";$("addMsg").textContent="Title is required.";return;}
+  const entry={id:"e"+Date.now().toString(36),author,title,
+    authors:$("f_authors").value.trim(),journal:$("f_journal").value.trim(),year:$("f_year").value.trim(),
     date:$("f_date").value||new Date().toISOString().slice(0,10),
     takeaway:$("f_takeaway").value.trim(),best:$("f_best").value.trim(),idea:$("f_idea").value.trim(),ts:new Date().toISOString()};
   $("addMsg").className="msg";$("addMsg").textContent="Saving…";$("addSave").disabled=true;
   try{
     await saveEntry(entry);localStorage.setItem("rg_me",author);
-    ["f_paper","f_takeaway","f_best","f_idea"].forEach(i=>$(i).value="");
+    ["f_title","f_authors","f_journal","f_year","f_takeaway","f_best","f_idea"].forEach(i=>$(i).value="");
     refreshView();closeAdd();
   }catch(e){$("addMsg").className="msg err";$("addMsg").textContent=e.message;}
   finally{$("addSave").disabled=false;}
