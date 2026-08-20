@@ -57,6 +57,10 @@
   .note{font-family:"Inter",sans-serif;font-size:.78rem;color:var(--muted);line-height:1.5;}
   a{color:var(--accent);}
   code{background:#f1efec;padding:1px 5px;border-radius:4px;font-size:.85em;}
+  ol.guide{font-family:"Inter",sans-serif;font-size:.82rem;color:var(--ink);line-height:1.5;padding-left:1.25em;margin:12px 0;}
+  ol.guide li{margin:6px 0;}
+  a.btnlink{display:inline-block;font-family:"Inter",sans-serif;font-size:.82rem;font-weight:600;text-decoration:none;
+    background:#111;color:#fff;padding:8px 13px;border-radius:8px;margin:2px 0 8px;}
 </style>
 </head>
 <body>
@@ -106,11 +110,21 @@
 <!-- Token modal -->
 <div class="scrim" id="tokenScrim">
   <div class="modal">
-    <h3>GitHub token</h3>
-    <p class="note">To <b>save</b> entries, paste a GitHub <b>fine-grained personal access token</b> with
-    <b>Contents: Read &amp; write</b> on the <code>peterywon.github.io</code> repository. It is stored only in
-    <b>this browser</b> (localStorage) and sent only to <code>api.github.com</code>. Reading the archive needs no token.</p>
-    <label>Token (starts with <code>github_pat_</code>)</label>
+    <h3>Set up your token &mdash; one time</h3>
+    <p class="note">Needed only to <b>save</b> entries (reading needs no token). Stored only in
+    <b>this browser</b> and sent only to <code>api.github.com</code>.</p>
+
+    <ol class="guide">
+      <li>Open the GitHub token page below and sign in.</li>
+      <li><b>Token name:</b> anything (e.g. &ldquo;reading-group&rdquo;). Set an expiration you like.</li>
+      <li><b>Repository access</b> &rarr; <b>Only select repositories</b> &rarr; choose <code>peterywon.github.io</code>.</li>
+      <li><b>Permissions</b> &rarr; <b>Repository permissions</b> &rarr; <b>Contents</b> &rarr; <b>Read and write</b>.</li>
+      <li>Click <b>Generate token</b>, copy it, paste below, and Save.</li>
+    </ol>
+
+    <a class="btnlink" href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Open GitHub token page &#8599;</a>
+
+    <label>Paste token <span class="note">(starts with <code>github_pat_</code>)</span></label>
     <input id="f_token" type="password" placeholder="github_pat_&hellip;">
     <div class="msg" id="tokenMsg"></div>
     <div class="actions">
@@ -118,8 +132,9 @@
       <button id="tokenCancel">Cancel</button>
       <button class="primary" id="tokenSave">Save token</button>
     </div>
-    <p class="note" style="margin-top:14px">Second person: the repo owner must add you as a
-    <b>collaborator</b> first, then create your own token. The archive is a public file.</p>
+    <p class="note" style="margin-top:14px"><b>Second person (Hanjun):</b> the repo owner adds you as a
+    <b>collaborator</b> (repo Settings &rarr; Collaborators &amp; teams) first &mdash; then make your own token the same way.
+    The archive is a <b>public</b> file.</p>
   </div>
 </div>
 
