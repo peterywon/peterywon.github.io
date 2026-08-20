@@ -84,8 +84,8 @@
   <div class="modal">
     <h3>Add an entry</h3>
     <label>Who</label>
-    <input id="f_author" list="memberDL" autocomplete="off" placeholder="Your name">
-    <datalist id="memberDL"></datalist>
+    <select id="f_author"></select>
+    <input id="f_authorNew" style="display:none;margin-top:8px" placeholder="Type the new name">
     <label>Paper <span class="note">(title / journal / year)</span></label>
     <input id="f_paper" placeholder="e.g., Investor Attention and Return Predictability (JF, 2025)">
     <label>Date read</label>
@@ -265,8 +265,11 @@ function showView(v){VIEW=v;localStorage.setItem("rg_view",v);
 // ---- modals ----
 function openAdd(){
   const mem=memberList();
-  $("memberDL").innerHTML=mem.map(m=>`<option value="${esc(m.name)}">`).join("");
-  $("f_author").value=localStorage.getItem("rg_me")||(mem[0]&&mem[0].name)||"";
+  $("f_author").innerHTML=mem.map(m=>`<option value="${esc(m.name)}">${esc(m.name)}</option>`).join("")
+    +'<option value="__new__">+ Add someone new…</option>';
+  const me=localStorage.getItem("rg_me");
+  $("f_author").value=(me&&mem.some(m=>m.name===me))?me:((mem[0]&&mem[0].name)||"");
+  $("f_authorNew").style.display="none";$("f_authorNew").value="";
   $("f_date").value=new Date().toISOString().slice(0,10);
   $("addMsg").textContent="";$("addScrim").classList.add("on");
 }
@@ -275,6 +278,7 @@ function openToken(){$("f_token").value=tokenGet();$("tokenMsg").textContent="";
 function closeToken(){$("tokenScrim").classList.remove("on");}
 
 $("addBtn").onclick=openAdd; $("addCancel").onclick=closeAdd;
+$("f_author").onchange=()=>{const nw=$("f_author").value==="__new__";$("f_authorNew").style.display=nw?"block":"none";if(nw)$("f_authorNew").focus();};
 $("tokenBtn").onclick=openToken; $("tokenCancel").onclick=closeToken;
 $("viewBtn").onclick=()=>showView(VIEW==="board"?"insights":"board");
 $("refreshBtn").onclick=async()=>{try{await loadFile();refreshView();}catch(e){alert(e.message);}};
@@ -291,8 +295,9 @@ $("board").addEventListener("click",async(ev)=>{
 });
 
 $("addSave").onclick=async()=>{
-  const paper=$("f_paper").value.trim(),author=$("f_author").value.trim();
-  if(!author){$("addMsg").className="msg err";$("addMsg").textContent="Please enter your name.";return;}
+  const paper=$("f_paper").value.trim();
+  const author=($("f_author").value==="__new__"?$("f_authorNew").value.trim():$("f_author").value);
+  if(!author){$("addMsg").className="msg err";$("addMsg").textContent="Please choose or type a name.";return;}
   if(!paper){$("addMsg").className="msg err";$("addMsg").textContent="Paper is required.";return;}
   const entry={id:"e"+Date.now().toString(36),author,paper,
     date:$("f_date").value||new Date().toISOString().slice(0,10),
