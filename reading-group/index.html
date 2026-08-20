@@ -16,28 +16,40 @@
   .sub{color:var(--muted);font-size:.92rem;font-family:"Inter",sans-serif;margin:0 0 18px;}
   .bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 22px;font-family:"Inter",sans-serif;}
   .bar input[type=search]{flex:1 1 240px;min-width:200px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--card);}
+  .bar select{padding:8px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--card);}
   button{font:inherit;font-family:"Inter",sans-serif;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:8px 14px;}
   button.primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600;}
   button.ghost{color:var(--muted);}
   .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;}
-  .col h2{font-family:"Inter",sans-serif;font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;
-    padding-bottom:6px;border-bottom:2px solid var(--line);margin:0 0 12px;display:flex;justify-content:space-between;align-items:baseline;}
+  .col h2{font-family:"Inter",sans-serif;font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;padding-bottom:6px;border-bottom:2px solid var(--line);margin:0 0 12px;display:flex;justify-content:space-between;align-items:baseline;}
   .col h2 .n{font-size:.72rem;color:var(--muted);font-weight:400;}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:13px 34px 13px 15px;margin:0 0 12px;position:relative;}
-  .card .del{position:absolute;top:7px;right:7px;border:none;background:transparent;color:#cbcbcb;font-size:1.2rem;line-height:1;padding:2px 7px;border-radius:6px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:11px 30px 11px 10px;margin:0 0 12px;position:relative;}
+  .card .del{position:absolute;top:6px;right:6px;border:none;background:transparent;color:#cbcbcb;font-size:1.15rem;line-height:1;padding:2px 6px;border-radius:6px;}
   .card .del:hover{color:#b3261e;background:#f7ecec;}
+  .chead{display:flex;gap:6px;align-items:flex-start;cursor:pointer;}
+  .tgl,.tgl-sp{border:none;background:transparent;color:#b3b3b3;font-size:.9rem;line-height:1;padding:3px 4px;margin-top:3px;transition:transform .15s;width:20px;text-align:center;}
+  .card.open .tgl{transform:rotate(90deg);}
+  .cmain{flex:1;min-width:0;}
   .card .pp{font-weight:700;line-height:1.3;}
-  .card .dt{font-family:"Inter",sans-serif;font-size:.74rem;color:var(--muted);margin:1px 0 8px;}
+  .card .dt{font-family:"Inter",sans-serif;font-size:.74rem;color:var(--muted);margin:1px 0 0;}
+  .card .tags{margin-top:2px;}
   .card .row{font-size:.92rem;margin:5px 0;}
   .card .row b{font-family:"Inter",sans-serif;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;display:block;}
+  .cbody{display:none;} .card.open .cbody{display:block;}
+  .tag{display:inline-block;font-family:"Inter",sans-serif;font-size:.66rem;font-weight:600;color:#fff;padding:2px 9px;border-radius:20px;margin:5px 6px 0 0;letter-spacing:.02em;}
+  .tag.area{background:#5c6b7a;}
   .empty{color:var(--muted);font-style:italic;font-size:.9rem;padding:8px 0;}
-  .scrim{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto;z-index:20;}
+  .scrim{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:flex-start;justify-content:center;padding:30px 16px;overflow:auto;z-index:20;}
   .scrim.on{display:flex;}
-  .modal{background:var(--card);border-radius:14px;max-width:460px;width:100%;padding:22px 22px 20px;box-shadow:0 20px 60px rgba(0,0,0,.25);}
-  .modal h3{margin:0 0 14px;font-size:1.15rem;}
-  .modal label{display:block;font-family:"Inter",sans-serif;font-size:.78rem;color:var(--muted);font-weight:600;margin:12px 0 4px;}
+  .modal{background:var(--card);border-radius:14px;max-width:480px;width:100%;padding:22px 22px 20px;box-shadow:0 20px 60px rgba(0,0,0,.25);}
+  .modal h3{margin:0 0 12px;font-size:1.15rem;}
+  .modal label{display:block;font-family:"Inter",sans-serif;font-size:.78rem;color:var(--muted);font-weight:600;margin:11px 0 4px;}
   .modal input,.modal textarea,.modal select{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#fff;}
-  .modal textarea{min-height:52px;resize:vertical;}
+  .modal textarea{min-height:46px;resize:vertical;}
+  .count{font-family:"Inter",sans-serif;font-size:.68rem;color:#b0b0b0;text-align:right;margin-top:2px;}
+  .row2{display:flex;gap:10px;}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;}
+  .chips button{border:1px solid var(--line);background:#fff;border-radius:20px;padding:6px 13px;font-size:.82rem;color:var(--muted);}
   .modal .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;}
   .msg{font-family:"Inter",sans-serif;font-size:.82rem;margin-top:10px;min-height:1.1em;}
   .msg.err{color:#b3261e;} .msg.ok{color:#1e6b2e;}
@@ -48,11 +60,12 @@
   ol.guide li{margin:6px 0;}
   a.btnlink{display:inline-block;font-family:"Inter",sans-serif;font-size:.82rem;font-weight:600;text-decoration:none;background:#111;color:#fff;padding:8px 13px;border-radius:8px;margin:2px 0 8px;}
   #insights{display:none;}
-  .tiles{display:flex;gap:12px;flex-wrap:wrap;margin:2px 0 20px;font-family:"Inter",sans-serif;}
+  .tiles{display:flex;gap:12px;flex-wrap:wrap;margin:2px 0 14px;font-family:"Inter",sans-serif;}
   .tile{flex:1 1 100px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:11px 14px;}
   .tile .v{font-size:1.55rem;font-weight:700;line-height:1.1;}
   .tile .k{font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-top:2px;}
   .section-title{font-family:"Inter",sans-serif;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:20px 0 8px;}
+  .tagrow{margin:0 0 6px;}
   .graphwrap,.cloud,.mapcard{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:0 0 12px;}
   .cloud{line-height:2;}
   .cloud h3,.mapcard h3{font-family:"Inter",sans-serif;font-size:.76rem;text-transform:uppercase;letter-spacing:.06em;margin:0 0 6px;}
@@ -64,10 +77,11 @@
 <body>
 <div class="wrap">
   <h1>Paper Reading Group &mdash; Archive</h1>
-  <p class="sub">One line per paper. Analog in the room; two minutes here afterward.</p>
+  <p class="sub">One short card per paper. Analog in the room; two minutes here afterward.</p>
 
   <div class="bar">
-    <input id="q" type="search" placeholder="Search papers, takeaways, ideas&hellip;">
+    <select id="whoami" title="Who am I? — enables deleting your own cards"></select>
+    <input id="q" type="search" placeholder="Search papers, questions, ideas&hellip;">
     <button id="viewBtn">&#128202; Insights</button>
     <button class="primary" id="addBtn">&#43; Add entry</button>
     <button id="refreshBtn">&#8635; Refresh</button>
@@ -87,21 +101,32 @@
     <select id="f_author"></select>
     <input id="f_authorNew" style="display:none;margin-top:8px" placeholder="Type the new name">
     <label>Title</label>
-    <input id="f_title" placeholder="e.g., Investor Attention and Return Predictability">
+    <input id="f_title" maxlength="140" placeholder="e.g., Investor Attention and Return Predictability">
     <label>Authors</label>
-    <input id="f_authors" placeholder="e.g., Smith &amp; Lee">
-    <div style="display:flex;gap:10px">
-      <div style="flex:2 1 0"><label>Journal / venue</label><input id="f_journal" placeholder="JF, RFS, WP, SSRN…"></div>
-      <div style="flex:1 1 0"><label>Year</label><input id="f_year" placeholder="2025"></div>
+    <input id="f_authors" maxlength="120" placeholder="e.g., Smith &amp; Lee">
+    <div class="row2">
+      <div style="flex:2 1 0"><label>Journal / venue</label><input id="f_journal" maxlength="40" placeholder="JF, RFS, WP&hellip;"></div>
+      <div style="flex:1 1 0"><label>Year</label><input id="f_year" maxlength="4" placeholder="2025"></div>
+    </div>
+    <div class="row2">
+      <div style="flex:1 1 0"><label>Area</label><select id="f_area"></select></div>
+      <div style="flex:1 1 0"><label>Sub-area</label><select id="f_sub"></select></div>
     </div>
     <label>Date read</label>
     <input id="f_date" type="date">
-    <label>One-line takeaway</label>
-    <textarea id="f_takeaway"></textarea>
-    <label>Best thing</label>
-    <textarea id="f_best"></textarea>
-    <label>Idea / question</label>
-    <textarea id="f_idea"></textarea>
+    <label>Main research question</label>
+    <textarea id="f_rq" maxlength="240" data-count></textarea>
+    <label>Main finding</label>
+    <textarea id="f_finding" maxlength="240" data-count></textarea>
+    <label>Things to remember <span class="note">(a method, a question, anything worth keeping)</span></label>
+    <textarea id="f_remember" maxlength="240" data-count></textarea>
+    <label>Contribution</label>
+    <div class="chips" id="f_contrib">
+      <button type="button" data-v="bad">bad</button>
+      <button type="button" data-v="marginal">marginal</button>
+      <button type="button" data-v="incremental">incremental</button>
+      <button type="button" data-v="incredible">incredible</button>
+    </div>
     <div class="msg" id="addMsg"></div>
     <div class="actions">
       <button id="addCancel">Cancel</button>
@@ -116,7 +141,7 @@
     <p class="note">Needed only to <b>save</b> or delete entries (reading needs no token). Stored only in
     <b>this browser</b> and sent only to <code>api.github.com</code>.</p>
     <ol class="guide">
-      <li>Have a GitHub account, and be a <b>collaborator</b> on this repo. <span class="note">New person: the owner adds you in repo <b>Settings &rarr; Collaborators</b>, and you accept the invite (check email / github.com notifications).</span></li>
+      <li>Have a GitHub account, and be a <b>collaborator</b> on this repo. <span class="note">New person: the owner adds you in repo <b>Settings &rarr; Collaborators</b>, and you accept the invite.</span></li>
       <li>Open the token page below (it pre-checks the right scope) and sign in.</li>
       <li>Set a <b>Note</b> and an expiration. Confirm <b>repo &rarr; public_repo</b> is checked.</li>
       <li>Click <b>Generate token</b>, copy it, paste below, and Save.</li>
@@ -130,17 +155,34 @@
       <button id="tokenCancel">Cancel</button>
       <button class="primary" id="tokenSave">Save token</button>
     </div>
-    <p class="note" style="margin-top:14px">Use a <b>classic</b> token with the <code>public_repo</code> scope so it works
-    for collaborators too. The archive is a <b>public</b> file.</p>
+    <p class="note" style="margin-top:14px">Use a <b>classic</b> token with the <code>public_repo</code> scope so it works for collaborators too. The archive is a <b>public</b> file.</p>
   </div>
 </div>
 
 <script>
 const OWNER="peterywon",REPO="peterywon.github.io",BRANCH="main",FILEPATH="reading-group/entries.json";
-// Known members always show. Anyone else who adds an entry appears automatically (color from palette).
 const MEMBERS=[{name:"Peter",color:"#8b1a1a"},{name:"Hanjun",color:"#1a4a8b"}];
 const PALETTE=["#2e7d32","#8a6d3b","#6a1b9a","#00838f","#b8860b","#455a64","#ad1457"];
-let SHA=null,ENTRIES=[],VIEW="board";
+const CONTRIB=[["bad","#8a3b3b"],["marginal","#b8860b"],["incremental","#1a4a8b"],["incredible","#1e6b2e"]];
+const AREAS={
+  "Asset Pricing":["Cross-section & anomalies","Factor models","Macro-finance","Return predictability","Volatility & options","Intermediary asset pricing","Behavioral asset pricing"],
+  "Corporate Finance":["Capital structure","Payout policy","M&A","Investment & financing","Corporate governance","Executive compensation","Cash & liquidity","Disclosure"],
+  "Investments":["Portfolio management","Mutual funds","Hedge funds","Institutional investors","Retail investors","Performance evaluation"],
+  "Market Microstructure":["Liquidity","Price discovery","High-frequency trading","Market design"],
+  "Banking & Intermediation":["Bank lending & capital","Financial intermediation","Systemic risk","Shadow banking"],
+  "Behavioral Finance":["Investor attention & sentiment","Beliefs & expectations","Limits to arbitrage"],
+  "Derivatives":["Options","Futures & swaps","Credit derivatives"],
+  "International Finance":["Exchange rates","Capital flows","International asset pricing"],
+  "Household & Consumer Finance":["Household portfolios","Consumer credit","Mortgages & housing","Payday & alternative finance"],
+  "FinTech, AI & Data":["FinTech & platforms","AI / ML in finance","Text & big data","Crypto & blockchain"],
+  "Entrepreneurial Finance":["Venture capital","Private equity","IPOs","Crowdfunding"],
+  "ESG & Climate Finance":["Climate finance","ESG investing","Governance & social"],
+  "Real Estate":["Housing","REITs","Commercial real estate"],
+  "Insurance & Pensions":["Insurance","Pensions & retirement"],
+  "Regulation & Policy":["Financial regulation","Monetary policy & finance","Taxation"],
+  "Other":["Other"]
+};
+let SHA=null,ENTRIES=[],VIEW="board",selContrib=null;
 
 const $=id=>document.getElementById(id);
 const esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -150,12 +192,14 @@ const b64dec=b=>decodeURIComponent(escape(atob(b.replace(/\s/g,""))));
 const byDate=(a,b)=>(b.date||"").localeCompare(a.date||"")||(b.ts||"").localeCompare(a.ts||"");
 
 function memberList(){
-  const map=new Map(MEMBERS.map(m=>[m.name,m.color])); let pi=0;
-  ENTRIES.forEach(e=>{if(e.author&&!map.has(e.author)) map.set(e.author,PALETTE[pi++%PALETTE.length]);});
+  const map=new Map(MEMBERS.map(m=>[m.name,m.color]));let pi=0;
+  ENTRIES.forEach(e=>{if(e.author&&!map.has(e.author))map.set(e.author,PALETTE[pi++%PALETTE.length]);});
   return [...map.entries()].map(([name,color])=>({name,color}));
 }
+const me=()=>localStorage.getItem("rg_me")||"";
+function fillWhoami(){const mem=memberList();
+  $("whoami").innerHTML='<option value="">— I&rsquo;m&hellip; —</option>'+mem.map(m=>`<option ${m.name===me()?"selected":""}>${esc(m.name)}</option>`).join("");}
 
-// ---- GitHub I/O ----
 async function loadFile(){
   const url=`https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILEPATH}?ref=${BRANCH}&t=${Date.now()}`;
   const h={"Accept":"application/vnd.github+json"};const t=tokenGet();if(t)h["Authorization"]="Bearer "+t;
@@ -181,18 +225,35 @@ async function saveEntry(entry){await loadFile();await commit(ENTRIES.concat([en
 async function deleteEntry(id){await loadFile();await commit(ENTRIES.filter(e=>e.id!==id),`archive: delete ${id}`);}
 
 // ---- boards ----
+const FIELDS=[["Main RQ","rq"],["Main finding","finding"],["Remember","remember"],["Takeaway","takeaway"],["Best thing","best"],["Idea / question","idea"]];
+function areaBadge(e){if(!e.area)return "";const t=e.subarea?e.area+" › "+e.subarea:e.area;return `<span class="tag area">${esc(t)}</span>`;}
+function contribBadge(e){if(!e.contribution)return "";const c=CONTRIB.find(x=>x[0]===e.contribution);return `<span class="tag" style="background:${c?c[1]:'#888'}">${esc(e.contribution)}</span>`;}
 function card(e){
-  const row=(lab,v)=>v?`<div class="row"><b>${lab}</b>${esc(v)}</div>`:"";
   const title=e.title||e.paper||"";
   const meta=[e.authors,[e.journal,e.year].filter(Boolean).join(" ")].filter(Boolean).join(" · ");
   const dt=[meta,e.date?"read "+e.date:""].filter(Boolean).join(" · ");
-  return `<div class="card"><button class="del" data-id="${esc(e.id)}" title="Delete this entry">&times;</button>
-    <div class="pp">${esc(title)}</div>${dt?`<div class="dt">${esc(dt)}</div>`:""}
-    ${row("Takeaway",e.takeaway)}${row("Best thing",e.best)}${row("Idea / question",e.idea)}</div>`;
+  const present=FIELDS.filter(([l,k])=>e[k]);
+  const primary=present[0],rest=present.slice(1);
+  const row=([lab,k])=>`<div class="row"><b>${lab}</b>${esc(e[k])}</div>`;
+  const badges=areaBadge(e)+contribBadge(e);
+  const canDel=e.author===me();
+  return `<div class="card" data-id="${esc(e.id)}">
+    ${canDel?`<button class="del" data-id="${esc(e.id)}" title="Delete">&times;</button>`:""}
+    <div class="chead">${rest.length?'<span class="tgl">&#9656;</span>':'<span class="tgl-sp"></span>'}
+      <div class="cmain">
+        <div class="pp">${esc(title)}</div>
+        ${dt?`<div class="dt">${esc(dt)}</div>`:""}
+        ${badges?`<div class="tags">${badges}</div>`:""}
+        ${primary?`<div class="row" style="margin-top:6px"><b>${primary[0]}</b>${esc(e[primary[1]])}</div>`:""}
+        <div class="cbody">${rest.map(row).join("")}</div>
+      </div>
+    </div>
+  </div>`;
 }
 function renderBoards(){
+  fillWhoami();
   const q=($("q").value||"").toLowerCase().trim();
-  const match=e=>!q||[e.title,e.authors,e.journal,e.year,e.paper,e.takeaway,e.best,e.idea,e.author].some(x=>(x||"").toLowerCase().includes(q));
+  const match=e=>!q||[e.title,e.authors,e.journal,e.year,e.area,e.subarea,e.rq,e.finding,e.remember,e.paper,e.takeaway,e.best,e.idea,e.author].some(x=>(x||"").toLowerCase().includes(q));
   $("board").innerHTML=memberList().map(m=>{
     const list=ENTRIES.filter(e=>e.author===m.name&&match(e)).sort(byDate);
     return `<div class="col"><h2 style="color:${m.color};border-color:${m.color}">${esc(m.name)} <span class="n">${list.length||""}</span></h2>`
@@ -205,7 +266,7 @@ const STOP=new Set(("the a an and or but of to in on for with as at by is are wa
 function tokens(s){return (s||"").toLowerCase().replace(/[^a-z0-9\s-]/g," ").split(/\s+/)
   .map(w=>w.replace(/^-+|-+$/g,"")).filter(w=>w.length>=3&&!STOP.has(w))
   .map(w=>(w.length>4&&w.endsWith("s")&&!w.endsWith("ss"))?w.slice(0,-1):w);}
-function entryText(e){return [e.idea,e.takeaway,e.best,e.title,e.authors,e.journal,e.paper].join(" ");}
+function entryText(e){return [e.rq,e.finding,e.remember,e.title,e.authors,e.area,e.subarea,e.takeaway,e.best,e.idea,e.paper].join(" ");}
 
 function buildGraph(entries,opts){
   opts=opts||{};const N=opts.N||18,W=opts.W||900,H=opts.H||360,E=opts.E||30;
@@ -234,8 +295,7 @@ function buildGraph(entries,opts){
   const color=opts.color||dom;
   let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:100%;height:auto;font-family:Inter,sans-serif">`;
   edges.forEach(e=>{const a=nodes[e.a],b=nodes[e.b];s+=`<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}" stroke="#c9ccd0" stroke-width="${Math.min(3,0.6+e.w*0.6).toFixed(1)}" stroke-opacity="0.7"/>`;});
-  nodes.forEach(n=>{const r=6+Math.round(12*Math.sqrt(n.freq/maxf));
-    s+=`<circle cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="${r}" fill="${color(n)}" fill-opacity="0.85"/><text x="${n.x.toFixed(1)}" y="${(n.y-r-4).toFixed(1)}" text-anchor="middle" font-size="12" fill="#1c1c1c">${esc(n.w)}</text>`;});
+  nodes.forEach(n=>{const r=6+Math.round(12*Math.sqrt(n.freq/maxf));s+=`<circle cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="${r}" fill="${color(n)}" fill-opacity="0.85"/><text x="${n.x.toFixed(1)}" y="${(n.y-r-4).toFixed(1)}" text-anchor="middle" font-size="12" fill="#1c1c1c">${esc(n.w)}</text>`;});
   return s+`</svg>`;
 }
 function cloudFor(m){
@@ -253,7 +313,13 @@ function computeInsights(){
   const tiles=[["Papers",ENTRIES.length]]
     .concat(mem.map(m=>[m.name,ENTRIES.filter(e=>e.author===m.name).length]))
     .concat([["This month",ENTRIES.filter(e=>(e.date||"").slice(0,7)===tm).length],["Keywords",kw.size]]);
+  const ac={};ENTRIES.forEach(e=>{if(e.area)ac[e.area]=(ac[e.area]||0)+1;});
+  const areaTags=Object.entries(ac).sort((a,b)=>b[1]-a[1]).map(([a,n])=>`<span class="tag area">${esc(a)} · ${n}</span>`).join("");
+  const cc={};ENTRIES.forEach(e=>{if(e.contribution)cc[e.contribution]=(cc[e.contribution]||0)+1;});
+  const contribTags=CONTRIB.filter(([v])=>cc[v]).map(([v,c])=>`<span class="tag" style="background:${c}">${v} · ${cc[v]}</span>`).join("");
   el.innerHTML='<div class="tiles">'+tiles.map(t=>`<div class="tile"><div class="v">${t[1]}</div><div class="k">${esc(String(t[0]))}</div></div>`).join("")+'</div>'
+    +(areaTags?'<div class="section-title">By area</div><div class="tagrow">'+areaTags+'</div>':'')
+    +(contribTags?'<div class="section-title">Contribution mix</div><div class="tagrow">'+contribTags+'</div>':'')
     +'<div class="section-title">Keyword map &mdash; ideas that show up together (everyone)</div><div class="graphwrap">'+buildGraph(ENTRIES,{})+'</div>'
     +'<div class="section-title">Each person&rsquo;s own map</div><div class="maps">'
       +mem.map(m=>`<div class="mapcard"><h3 style="color:${m.color}">${esc(m.name)}</h3>`+buildGraph(ENTRIES.filter(e=>e.author===m.name),{color:()=>m.color,W:460,H:300,N:14,E:22})+'</div>').join("")
@@ -271,16 +337,26 @@ function showView(v){VIEW=v;localStorage.setItem("rg_view",v);
   refreshView();
 }
 
-// ---- modals ----
+// ---- form helpers ----
+function fillAreas(){$("f_area").innerHTML='<option value="">— area —</option>'+Object.keys(AREAS).map(a=>`<option>${esc(a)}</option>`).join("");}
+function fillSub(){const a=$("f_area").value;$("f_sub").innerHTML='<option value="">— sub-area —</option>'+((AREAS[a]||[]).map(s=>`<option>${esc(s)}</option>`).join(""));}
+function renderContrib(){[...$("f_contrib").children].forEach(b=>{const on=b.dataset.v===selContrib,c=CONTRIB.find(x=>x[0]===b.dataset.v);
+  b.classList.toggle("on",on);b.style.background=on?c[1]:"";b.style.color=on?"#fff":"";b.style.borderColor=on?c[1]:"";});}
+function updateCounts(){document.querySelectorAll('[data-count]').forEach(el=>{let c=el.nextElementSibling;
+  if(!c||!c.classList.contains('count')){c=document.createElement('div');c.className='count';el.insertAdjacentElement('afterend',c);}
+  c.textContent=el.value.length+"/"+el.maxLength;});}
+document.querySelectorAll('[data-count]').forEach(el=>el.addEventListener('input',updateCounts));
+
 function openAdd(){
   const mem=memberList();
-  $("f_author").innerHTML=mem.map(m=>`<option value="${esc(m.name)}">${esc(m.name)}</option>`).join("")
-    +'<option value="__new__">+ Add someone new…</option>';
+  $("f_author").innerHTML=mem.map(m=>`<option value="${esc(m.name)}">${esc(m.name)}</option>`).join("")+'<option value="__new__">+ Add someone new…</option>';
   const me=localStorage.getItem("rg_me");
   $("f_author").value=(me&&mem.some(m=>m.name===me))?me:((mem[0]&&mem[0].name)||"");
   $("f_authorNew").style.display="none";$("f_authorNew").value="";
+  fillAreas();$("f_area").value="";fillSub();
+  selContrib=null;renderContrib();
   $("f_date").value=new Date().toISOString().slice(0,10);
-  $("addMsg").textContent="";$("addScrim").classList.add("on");
+  updateCounts();$("addMsg").textContent="";$("addScrim").classList.add("on");
 }
 function closeAdd(){$("addScrim").classList.remove("on");}
 function openToken(){$("f_token").value=tokenGet();$("tokenMsg").textContent="";$("tokenScrim").classList.add("on");}
@@ -288,37 +364,45 @@ function closeToken(){$("tokenScrim").classList.remove("on");}
 
 $("addBtn").onclick=openAdd; $("addCancel").onclick=closeAdd;
 $("f_author").onchange=()=>{const nw=$("f_author").value==="__new__";$("f_authorNew").style.display=nw?"block":"none";if(nw)$("f_authorNew").focus();};
+$("f_area").onchange=fillSub;
+$("f_contrib").addEventListener("click",e=>{const b=e.target.closest("button[data-v]");if(!b)return;selContrib=(selContrib===b.dataset.v)?null:b.dataset.v;renderContrib();});
 $("tokenBtn").onclick=openToken; $("tokenCancel").onclick=closeToken;
-document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ closeAdd(); closeToken(); } });
-[$("addScrim"),$("tokenScrim")].forEach(s=>s.addEventListener("click",e=>{ if(e.target===s){ closeAdd(); closeToken(); } }));
 $("viewBtn").onclick=()=>showView(VIEW==="board"?"insights":"board");
 $("refreshBtn").onclick=async()=>{try{await loadFile();refreshView();}catch(e){alert(e.message);}};
 $("q").oninput=renderBoards;
+$("whoami").onchange=()=>{localStorage.setItem("rg_me",$("whoami").value);renderBoards();};
 $("tokenSave").onclick=()=>{localStorage.setItem("rg_token",$("f_token").value.trim());$("tokenMsg").className="msg ok";$("tokenMsg").textContent="Saved in this browser.";setTimeout(closeToken,700);};
 $("tokenClear").onclick=()=>{localStorage.removeItem("rg_token");$("f_token").value="";$("tokenMsg").className="msg ok";$("tokenMsg").textContent="Cleared.";};
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeAdd();closeToken();}});
+[$("addScrim"),$("tokenScrim")].forEach(s=>s.addEventListener("click",e=>{if(e.target===s){closeAdd();closeToken();}}));
 
 $("board").addEventListener("click",async(ev)=>{
-  const btn=ev.target.closest(".del");if(!btn)return;
-  const id=btn.getAttribute("data-id"),e=ENTRIES.find(x=>x.id===id);
-  if(!confirm("Delete this entry?\n\n"+(e?e.paper:"")))return;
-  btn.disabled=true;
-  try{await deleteEntry(id);refreshView();}catch(err){alert(err.message);btn.disabled=false;}
+  const del=ev.target.closest(".del");
+  if(del){const id=del.getAttribute("data-id"),e=ENTRIES.find(x=>x.id===id);
+    if(!confirm("Delete this entry?\n\n"+(e?(e.title||e.paper||""):"")))return;
+    del.disabled=true;try{await deleteEntry(id);refreshView();}catch(err){alert(err.message);del.disabled=false;}return;}
+  const head=ev.target.closest(".chead");
+  if(head){head.closest(".card").classList.toggle("open");}
 });
 
 $("addSave").onclick=async()=>{
   const title=$("f_title").value.trim();
   const author=($("f_author").value==="__new__"?$("f_authorNew").value.trim():$("f_author").value);
+  const area=$("f_area").value;
   if(!author){$("addMsg").className="msg err";$("addMsg").textContent="Please choose or type a name.";return;}
   if(!title){$("addMsg").className="msg err";$("addMsg").textContent="Title is required.";return;}
+  if(!area){$("addMsg").className="msg err";$("addMsg").textContent="Please pick an area.";return;}
   const entry={id:"e"+Date.now().toString(36),author,title,
     authors:$("f_authors").value.trim(),journal:$("f_journal").value.trim(),year:$("f_year").value.trim(),
+    area,subarea:$("f_sub").value,
     date:$("f_date").value||new Date().toISOString().slice(0,10),
-    takeaway:$("f_takeaway").value.trim(),best:$("f_best").value.trim(),idea:$("f_idea").value.trim(),ts:new Date().toISOString()};
+    rq:$("f_rq").value.trim(),finding:$("f_finding").value.trim(),remember:$("f_remember").value.trim(),
+    contribution:selContrib,ts:new Date().toISOString()};
   $("addMsg").className="msg";$("addMsg").textContent="Saving…";$("addSave").disabled=true;
   try{
     await saveEntry(entry);localStorage.setItem("rg_me",author);
-    ["f_title","f_authors","f_journal","f_year","f_takeaway","f_best","f_idea"].forEach(i=>$(i).value="");
-    refreshView();closeAdd();
+    ["f_title","f_authors","f_journal","f_year","f_rq","f_finding","f_remember"].forEach(i=>$(i).value="");
+    selContrib=null;renderContrib();updateCounts();refreshView();closeAdd();
   }catch(e){$("addMsg").className="msg err";$("addMsg").textContent=e.message;}
   finally{$("addSave").disabled=false;}
 };
@@ -326,7 +410,7 @@ $("addSave").onclick=async()=>{
 (async function init(){
   $("foot").innerHTML='Data lives in <code>reading-group/entries.json</code> in the '+
     '<a href="https://github.com/'+OWNER+'/'+REPO+'" target="_blank" rel="noopener">GitHub repo</a> &mdash; version-controlled and searchable. '+
-    'To add another person: the owner adds them as a repo collaborator; then they just type their name when adding an entry.';
+    'To add another person: the owner adds them as a repo collaborator; then they pick their name when adding an entry.';
   try{await loadFile();}catch(e){$("foot").innerHTML='<span style="color:#b3261e">'+esc(e.message)+'</span>';}
   showView(localStorage.getItem("rg_view")||"board");
 })();
