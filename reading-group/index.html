@@ -23,7 +23,9 @@
   .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;}
   .col h2{font-family:"Inter",sans-serif;font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;padding-bottom:6px;border-bottom:2px solid var(--line);margin:0 0 12px;display:flex;justify-content:space-between;align-items:baseline;}
   .col h2 .n{font-size:.72rem;color:var(--muted);font-weight:400;}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:11px 30px 11px 10px;margin:0 0 12px;position:relative;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:11px 52px 11px 10px;margin:0 0 12px;position:relative;}
+  .card .edit{position:absolute;top:6px;right:28px;border:none;background:transparent;color:#cbcbcb;font-size:.98rem;line-height:1;padding:2px 6px;border-radius:6px;}
+  .card .edit:hover{color:#1a4a8b;background:#eef2f8;}
   .card .del{position:absolute;top:6px;right:6px;border:none;background:transparent;color:#cbcbcb;font-size:1.15rem;line-height:1;padding:2px 6px;border-radius:6px;}
   .card .del:hover{color:#b3261e;background:#f7ecec;}
   .chead{display:flex;gap:6px;align-items:flex-start;cursor:pointer;}
@@ -85,6 +87,7 @@
     <button id="viewBtn">&#128202; Insights</button>
     <button class="primary" id="addBtn">&#43; Add entry</button>
     <button id="refreshBtn">&#8635; Refresh</button>
+    <button class="ghost" id="pwBtn">&#128274; Password</button>
     <button class="ghost" id="tokenBtn">&#128273; Token</button>
   </div>
 
@@ -182,7 +185,9 @@ const AREAS={
   "Regulation & Policy":["Financial regulation","Monetary policy & finance","Taxation"],
   "Other":["Other"]
 };
-let SHA=null,ENTRIES=[],VIEW="board",selContrib=null;
+let SHA=null,ENTRIES=[],VIEW="board",selContrib=null,editingId=null;
+let USERS={},USERS_SHA=null;
+async function sha256(s){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode("rg::"+s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("");}
 
 const $=id=>document.getElementById(id);
 const esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -224,6 +229,48 @@ async function commit(next,message){
 async function saveEntry(entry){await loadFile();await commit(ENTRIES.concat([entry]),`archive: ${entry.author} — ${entry.title||entry.paper}`);}
 async function deleteEntry(id){await loadFile();await commit(ENTRIES.filter(e=>e.id!==id),`archive: delete ${id}`);}
 
+// ---- per-user passwords (soft gate on edit/delete) ----
+async function loadUsers(){
+  const url=`https://api.github.com/repos/${OWNER}/${REPO}/contents/reading-group/users.json?ref=${BRANCH}&t=${Date.now()}`;
+  const h={"Accept":"application/vnd.github+json"};const t=tokenGet();if(t)h["Authorization"]="Bearer "+t;
+  const r=await fetch(url,{headers:h,cache:"no-store"});
+  if(!r.ok){USERS={};USERS_SHA=null;return;}
+  const j=await r.json();USERS_SHA=j.sha;try{USERS=JSON.parse(b64dec(j.content)||"{}");}catch(e){USERS={};}
+}
+async function saveUsers(next){
+  const t=tokenGet();if(!t){openToken();throw new Error("Set a GitHub token first.");}
+  const body={message:"archive: update users",content:b64enc(JSON.stringify(next,null,2)),branch:BRANCH};
+  if(USERS_SHA)body.sha=USERS_SHA;
+  const r=await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/reading-group/users.json`,
+    {method:"PUT",headers:{"Authorization":"Bearer "+t,"Accept":"application/vnd.github+json"},body:JSON.stringify(body)});
+  if(!r.ok){let m=r.status;try{m+=" "+(await r.json()).message;}catch(e){}throw new Error("Save failed: "+m);}
+  const j=await r.json();USERS_SHA=j.content.sha;USERS=next;
+}
+async function requirePassword(author){
+  await loadUsers();
+  if(!USERS[author]){
+    const p1=prompt(`No password set for "${author}" yet.\nCreate one now (you'll need it to edit/delete your cards):`);
+    if(!p1) return false;
+    try{ await saveUsers(Object.assign({},USERS,{[author]:await sha256(p1)})); }
+    catch(e){ alert(e.message); return false; }
+    alert("Password set.");
+    return true;
+  }
+  const p=prompt(`Enter ${author}'s password:`);
+  if(p===null) return false;
+  if(await sha256(p)!==USERS[author]){ alert("Wrong password."); return false; }
+  return true;
+}
+async function changePassword(){
+  const who=me(); if(!who){ alert("Pick “I'm …” at the top-left first."); return; }
+  await loadUsers();
+  if(USERS[who]){ const old=prompt(`Current password for ${who}:`); if(old===null) return;
+    if(await sha256(old)!==USERS[who]){ alert("Wrong password."); return; } }
+  const np=prompt(`New password for ${who}:`); if(!np) return;
+  try{ await saveUsers(Object.assign({},USERS,{[who]:await sha256(np)})); alert("Password updated."); }
+  catch(e){ alert(e.message); }
+}
+
 // ---- boards ----
 const FIELDS=[["Main RQ","rq"],["Main finding","finding"],["Remember","remember"],["Takeaway","takeaway"],["Best thing","best"],["Idea / question","idea"]];
 function areaBadge(e){if(!e.area)return "";const t=e.subarea?e.area+" › "+e.subarea:e.area;return `<span class="tag area">${esc(t)}</span>`;}
@@ -236,9 +283,9 @@ function card(e){
   const primary=present[0],rest=present.slice(1);
   const row=([lab,k])=>`<div class="row"><b>${lab}</b>${esc(e[k])}</div>`;
   const badges=areaBadge(e)+contribBadge(e);
-  const canDel=e.author===me();
+  const mine=e.author===me();
   return `<div class="card" data-id="${esc(e.id)}">
-    ${canDel?`<button class="del" data-id="${esc(e.id)}" title="Delete">&times;</button>`:""}
+    ${mine?`<button class="edit" data-id="${esc(e.id)}" title="Edit">&#9998;</button><button class="del" data-id="${esc(e.id)}" title="Delete">&times;</button>`:""}
     <div class="chead">${rest.length?'<span class="tgl">&#9656;</span>':'<span class="tgl-sp"></span>'}
       <div class="cmain">
         <div class="pp">${esc(title)}</div>
@@ -347,11 +394,28 @@ function updateCounts(){document.querySelectorAll('[data-count]').forEach(el=>{l
   c.textContent=el.value.length+"/"+el.maxLength;});}
 document.querySelectorAll('[data-count]').forEach(el=>el.addEventListener('input',updateCounts));
 
-function openAdd(){
+async function openEdit(id){
+  const e=ENTRIES.find(x=>x.id===id); if(!e) return;
+  if(!await requirePassword(e.author)) return;
+  editingId=id;
   const mem=memberList();
   $("f_author").innerHTML=mem.map(m=>`<option value="${esc(m.name)}">${esc(m.name)}</option>`).join("")+'<option value="__new__">+ Add someone new…</option>';
-  const me=localStorage.getItem("rg_me");
-  $("f_author").value=(me&&mem.some(m=>m.name===me))?me:((mem[0]&&mem[0].name)||"");
+  $("f_author").value=e.author;$("f_authorNew").style.display="none";$("f_authorNew").value="";
+  $("f_title").value=e.title||e.paper||"";$("f_authors").value=e.authors||"";$("f_journal").value=e.journal||"";$("f_year").value=e.year||"";
+  fillAreas();$("f_area").value=e.area||"";fillSub();$("f_sub").value=e.subarea||"";
+  $("f_date").value=e.date||new Date().toISOString().slice(0,10);
+  $("f_rq").value=e.rq||e.takeaway||"";$("f_finding").value=e.finding||e.best||"";$("f_remember").value=e.remember||e.idea||"";
+  selContrib=e.contribution||null;renderContrib();updateCounts();
+  document.querySelector("#addScrim h3").textContent="Edit entry";$("addSave").textContent="Save changes";
+  $("addMsg").textContent="";$("addScrim").classList.add("on");
+}
+function openAdd(){
+  editingId=null;
+  const mem=memberList();
+  $("f_author").innerHTML=mem.map(m=>`<option value="${esc(m.name)}">${esc(m.name)}</option>`).join("")+'<option value="__new__">+ Add someone new…</option>';
+  document.querySelector("#addScrim h3").textContent="Add an entry";$("addSave").textContent="Save to archive";
+  const me2=localStorage.getItem("rg_me");
+  $("f_author").value=(me2&&mem.some(m=>m.name===me2))?me2:((mem[0]&&mem[0].name)||"");
   $("f_authorNew").style.display="none";$("f_authorNew").value="";
   fillAreas();$("f_area").value="";fillSub();
   selContrib=null;renderContrib();
@@ -367,6 +431,7 @@ $("f_author").onchange=()=>{const nw=$("f_author").value==="__new__";$("f_author
 $("f_area").onchange=fillSub;
 $("f_contrib").addEventListener("click",e=>{const b=e.target.closest("button[data-v]");if(!b)return;selContrib=(selContrib===b.dataset.v)?null:b.dataset.v;renderContrib();});
 $("tokenBtn").onclick=openToken; $("tokenCancel").onclick=closeToken;
+$("pwBtn").onclick=changePassword;
 $("viewBtn").onclick=()=>showView(VIEW==="board"?"insights":"board");
 $("refreshBtn").onclick=async()=>{try{await loadFile();refreshView();}catch(e){alert(e.message);}};
 $("q").oninput=renderBoards;
@@ -377,10 +442,14 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeAdd();closeTok
 [$("addScrim"),$("tokenScrim")].forEach(s=>s.addEventListener("click",e=>{if(e.target===s){closeAdd();closeToken();}}));
 
 $("board").addEventListener("click",async(ev)=>{
+  const editB=ev.target.closest(".edit");
+  if(editB){ openEdit(editB.getAttribute("data-id")); return; }
   const del=ev.target.closest(".del");
-  if(del){const id=del.getAttribute("data-id"),e=ENTRIES.find(x=>x.id===id);
-    if(!confirm("Delete this entry?\n\n"+(e?(e.title||e.paper||""):"")))return;
-    del.disabled=true;try{await deleteEntry(id);refreshView();}catch(err){alert(err.message);del.disabled=false;}return;}
+  if(del){const id=del.getAttribute("data-id"),e=ENTRIES.find(x=>x.id===id); if(!e)return;
+    del.disabled=true;
+    try{ if(await requirePassword(e.author)){ await deleteEntry(id); refreshView(); } }
+    catch(err){alert(err.message);} finally{del.disabled=false;}
+    return;}
   const head=ev.target.closest(".chead");
   if(head){head.closest(".card").classList.toggle("open");}
 });
@@ -392,17 +461,22 @@ $("addSave").onclick=async()=>{
   if(!author){$("addMsg").className="msg err";$("addMsg").textContent="Please choose or type a name.";return;}
   if(!title){$("addMsg").className="msg err";$("addMsg").textContent="Title is required.";return;}
   if(!area){$("addMsg").className="msg err";$("addMsg").textContent="Please pick an area.";return;}
-  const entry={id:"e"+Date.now().toString(36),author,title,
-    authors:$("f_authors").value.trim(),journal:$("f_journal").value.trim(),year:$("f_year").value.trim(),
-    area,subarea:$("f_sub").value,
-    date:$("f_date").value||new Date().toISOString().slice(0,10),
-    rq:$("f_rq").value.trim(),finding:$("f_finding").value.trim(),remember:$("f_remember").value.trim(),
-    contribution:selContrib,ts:new Date().toISOString()};
+  const base={author,title,authors:$("f_authors").value.trim(),journal:$("f_journal").value.trim(),year:$("f_year").value.trim(),
+    area,subarea:$("f_sub").value,date:$("f_date").value||new Date().toISOString().slice(0,10),
+    rq:$("f_rq").value.trim(),finding:$("f_finding").value.trim(),remember:$("f_remember").value.trim(),contribution:selContrib};
   $("addMsg").className="msg";$("addMsg").textContent="Saving…";$("addSave").disabled=true;
   try{
-    await saveEntry(entry);localStorage.setItem("rg_me",author);
+    if(editingId){
+      await loadFile();
+      const arr=ENTRIES.map(x=>{ if(x.id!==editingId) return x;
+        const u=Object.assign({},x,base,{id:editingId}); ["takeaway","best","idea","paper"].forEach(k=>delete u[k]); return u; });
+      await commit(arr,`archive: edit ${author} — ${title}`);
+    } else {
+      await saveEntry(Object.assign({id:"e"+Date.now().toString(36),ts:new Date().toISOString()},base));
+    }
+    localStorage.setItem("rg_me",author);
     ["f_title","f_authors","f_journal","f_year","f_rq","f_finding","f_remember"].forEach(i=>$(i).value="");
-    selContrib=null;renderContrib();updateCounts();refreshView();closeAdd();
+    selContrib=null;renderContrib();updateCounts();editingId=null;refreshView();closeAdd();
   }catch(e){$("addMsg").className="msg err";$("addMsg").textContent=e.message;}
   finally{$("addSave").disabled=false;}
 };
