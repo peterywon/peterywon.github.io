@@ -1,12 +1,12 @@
 [
   {
-    "id": "seed-1",
+    "id": "green-aipdr-2026",
     "author": "Peter",
-    "paper": "XYZ (JF, 2025)",
-    "date": "2026-01-15",
-    "takeaway": "Investor attention changes how quickly stale signals decay.",
-    "best": "Very clean shock to attention.",
-    "idea": "Could this work for anomaly rebalancing?",
-    "ts": "2026-01-15T00:00:00Z"
+    "paper": "Green, Li & Papanikolaou (2026) — Generative AI Product Displacement Risk (WP)",
+    "date": "2026-08-19",
+    "takeaway": "AI-PDR (how digitally-deliverable a firm's products are, scored from 10-K text by an LLM) predicts ~10pp lower CARs when Anthropic's open-source Cowork Plugins launched targeted agents; general model releases (ChatGPT, Opus 4.5) don't reprice it.",
+    "best": "Sharp identification of *when* the market prices product-displacement risk — only the product-targeting release moves prices, and supply-side shields (moats/regulation) attenuate the effect ~37%.",
+    "idea": "Cowork Plugins are open-source complements — this is 'commoditize your complement' at the product level. Pair AI-PDR with my OSS-release / Data Power setting: does a platform's open-source AI push transfer value away from high-deliverability complement firms?",
+    "ts": "2026-08-19T00:00:00Z"
   }
 ]

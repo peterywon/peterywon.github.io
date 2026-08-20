@@ -254,7 +254,7 @@ function computeInsights(){
 }
 
 function refreshView(){ VIEW==="insights"?computeInsights():renderBoards(); }
-function showView(v){VIEW=v;
+function showView(v){VIEW=v;localStorage.setItem("rg_view",v);
   $("board").style.display=v==="board"?"":"none";
   $("insights").style.display=v==="insights"?"block":"none";
   $("q").style.display=v==="board"?"":"none";
@@ -311,7 +311,7 @@ $("addSave").onclick=async()=>{
     '<a href="https://github.com/'+OWNER+'/'+REPO+'" target="_blank" rel="noopener">GitHub repo</a> &mdash; version-controlled and searchable. '+
     'To add another person: the owner adds them as a repo collaborator; then they just type their name when adding an entry.';
   try{await loadFile();}catch(e){$("foot").innerHTML='<span style="color:#b3261e">'+esc(e.message)+'</span>';}
-  renderBoards();
+  showView(localStorage.getItem("rg_view")||"board");
 })();
 </script>
 </body>
