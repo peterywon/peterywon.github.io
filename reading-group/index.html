@@ -8,51 +8,35 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --ink:#1c1c1c; --muted:#5c5c5c; --line:#e3e3e3; --accent:#8b1a1a; --bg:#fdfdfc; --card:#ffffff;
-    --peter:#8b1a1a; --hanjun:#1a4a8b;
-  }
+  :root{--ink:#1c1c1c;--muted:#5c5c5c;--line:#e3e3e3;--accent:#8b1a1a;--bg:#fdfdfc;--card:#ffffff;}
   *{box-sizing:border-box;}
-  body{margin:0;background:var(--bg);color:var(--ink);
-    font-family:"Source Serif 4",Georgia,serif;font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Source Serif 4",Georgia,serif;font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;}
   .wrap{max-width:1000px;margin:0 auto;padding:28px 20px 80px;}
   h1{font-size:1.5rem;margin:0 0 2px;}
   .sub{color:var(--muted);font-size:.92rem;font-family:"Inter",sans-serif;margin:0 0 18px;}
   .bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 22px;font-family:"Inter",sans-serif;}
-  .bar input[type=search]{flex:1 1 240px;min-width:200px;padding:8px 12px;border:1px solid var(--line);
-    border-radius:8px;font:inherit;background:var(--card);}
-  button{font:inherit;font-family:"Inter",sans-serif;cursor:pointer;border:1px solid var(--line);
-    background:var(--card);color:var(--ink);border-radius:8px;padding:8px 14px;}
+  .bar input[type=search]{flex:1 1 240px;min-width:200px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--card);}
+  button{font:inherit;font-family:"Inter",sans-serif;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:8px 14px;}
   button.primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600;}
   button.ghost{color:var(--muted);}
-  .cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
-  @media(max-width:680px){.cols{grid-template-columns:1fr;}}
+  .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;}
   .col h2{font-family:"Inter",sans-serif;font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;
-    padding-bottom:6px;border-bottom:2px solid;margin:0 0 12px;display:flex;justify-content:space-between;align-items:baseline;}
-  .col.peter h2{color:var(--peter);border-color:var(--peter);}
-  .col.hanjun h2{color:var(--hanjun);border-color:var(--hanjun);}
+    padding-bottom:6px;border-bottom:2px solid var(--line);margin:0 0 12px;display:flex;justify-content:space-between;align-items:baseline;}
   .col h2 .n{font-size:.72rem;color:var(--muted);font-weight:400;}
   .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:13px 34px 13px 15px;margin:0 0 12px;position:relative;}
-  .card .del{position:absolute;top:7px;right:7px;border:none;background:transparent;color:#cbcbcb;
-    font-size:1.2rem;line-height:1;padding:2px 7px;border-radius:6px;}
+  .card .del{position:absolute;top:7px;right:7px;border:none;background:transparent;color:#cbcbcb;font-size:1.2rem;line-height:1;padding:2px 7px;border-radius:6px;}
   .card .del:hover{color:#b3261e;background:#f7ecec;}
   .card .pp{font-weight:700;line-height:1.3;}
   .card .dt{font-family:"Inter",sans-serif;font-size:.74rem;color:var(--muted);margin:1px 0 8px;}
   .card .row{font-size:.92rem;margin:5px 0;}
-  .card .row b{font-family:"Inter",sans-serif;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;
-    color:var(--muted);font-weight:600;display:block;}
+  .card .row b{font-family:"Inter",sans-serif;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;display:block;}
   .empty{color:var(--muted);font-style:italic;font-size:.9rem;padding:8px 0;}
-  /* modal */
-  .scrim{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:flex-start;justify-content:center;
-    padding:40px 16px;overflow:auto;z-index:20;}
+  .scrim{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto;z-index:20;}
   .scrim.on{display:flex;}
-  .modal{background:var(--card);border-radius:14px;max-width:460px;width:100%;padding:22px 22px 20px;
-    box-shadow:0 20px 60px rgba(0,0,0,.25);}
+  .modal{background:var(--card);border-radius:14px;max-width:460px;width:100%;padding:22px 22px 20px;box-shadow:0 20px 60px rgba(0,0,0,.25);}
   .modal h3{margin:0 0 14px;font-size:1.15rem;}
-  .modal label{display:block;font-family:"Inter",sans-serif;font-size:.78rem;color:var(--muted);
-    font-weight:600;margin:12px 0 4px;}
-  .modal input,.modal textarea,.modal select{width:100%;padding:8px 10px;border:1px solid var(--line);
-    border-radius:8px;font:inherit;background:#fff;}
+  .modal label{display:block;font-family:"Inter",sans-serif;font-size:.78rem;color:var(--muted);font-weight:600;margin:12px 0 4px;}
+  .modal input,.modal textarea,.modal select{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#fff;}
   .modal textarea{min-height:52px;resize:vertical;}
   .modal .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;}
   .msg{font-family:"Inter",sans-serif;font-size:.82rem;margin-top:10px;min-height:1.1em;}
@@ -62,18 +46,19 @@
   code{background:#f1efec;padding:1px 5px;border-radius:4px;font-size:.85em;}
   ol.guide{font-family:"Inter",sans-serif;font-size:.82rem;color:var(--ink);line-height:1.5;padding-left:1.25em;margin:12px 0;}
   ol.guide li{margin:6px 0;}
-  a.btnlink{display:inline-block;font-family:"Inter",sans-serif;font-size:.82rem;font-weight:600;text-decoration:none;
-    background:#111;color:#fff;padding:8px 13px;border-radius:8px;margin:2px 0 8px;}
+  a.btnlink{display:inline-block;font-family:"Inter",sans-serif;font-size:.82rem;font-weight:600;text-decoration:none;background:#111;color:#fff;padding:8px 13px;border-radius:8px;margin:2px 0 8px;}
   #insights{display:none;}
   .tiles{display:flex;gap:12px;flex-wrap:wrap;margin:2px 0 20px;font-family:"Inter",sans-serif;}
-  .tile{flex:1 1 110px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:11px 14px;}
+  .tile{flex:1 1 100px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:11px 14px;}
   .tile .v{font-size:1.55rem;font-weight:700;line-height:1.1;}
   .tile .k{font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-top:2px;}
   .section-title{font-family:"Inter",sans-serif;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:20px 0 8px;}
-  .graphwrap,.cloud{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:0 0 12px;}
+  .graphwrap,.cloud,.mapcard{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:0 0 12px;}
   .cloud{line-height:2;}
-  .cloud h3{font-family:"Inter",sans-serif;font-size:.76rem;text-transform:uppercase;letter-spacing:.06em;margin:0 0 6px;}
+  .cloud h3,.mapcard h3{font-family:"Inter",sans-serif;font-size:.76rem;text-transform:uppercase;letter-spacing:.06em;margin:0 0 6px;}
   .cloud .w{display:inline-block;margin:1px 9px 1px 0;font-weight:600;}
+  .maps{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px;}
+  .maps .mapcard{margin:0;}
 </style>
 </head>
 <body>
@@ -83,28 +68,24 @@
 
   <div class="bar">
     <input id="q" type="search" placeholder="Search papers, takeaways, ideas&hellip;">
-    <button class="primary" id="addBtn">&#43; Add entry</button>
     <button id="viewBtn">&#128202; Insights</button>
+    <button class="primary" id="addBtn">&#43; Add entry</button>
     <button id="refreshBtn">&#8635; Refresh</button>
     <button class="ghost" id="tokenBtn">&#128273; Token</button>
   </div>
 
-  <div class="cols" id="board">
-    <div class="col peter"><h2>Peter <span class="n" id="nPeter"></span></h2><div id="colPeter"></div></div>
-    <div class="col hanjun"><h2>Hanjun <span class="n" id="nHanjun"></span></h2><div id="colHanjun"></div></div>
-  </div>
-
+  <div class="cols" id="board"></div>
   <div id="insights"></div>
 
   <p class="note" id="foot" style="margin-top:26px"></p>
 </div>
 
-<!-- Add entry modal -->
 <div class="scrim" id="addScrim">
   <div class="modal">
     <h3>Add an entry</h3>
     <label>Who</label>
-    <select id="f_author"><option>Peter</option><option>Hanjun</option></select>
+    <input id="f_author" list="memberDL" autocomplete="off" placeholder="Your name">
+    <datalist id="memberDL"></datalist>
     <label>Paper <span class="note">(title / journal / year)</span></label>
     <input id="f_paper" placeholder="e.g., Investor Attention and Return Predictability (JF, 2025)">
     <label>Date read</label>
@@ -123,22 +104,18 @@
   </div>
 </div>
 
-<!-- Token modal -->
 <div class="scrim" id="tokenScrim">
   <div class="modal">
     <h3>Set up your token &mdash; one time</h3>
-    <p class="note">Needed only to <b>save</b> entries (reading needs no token). Stored only in
+    <p class="note">Needed only to <b>save</b> or delete entries (reading needs no token). Stored only in
     <b>this browser</b> and sent only to <code>api.github.com</code>.</p>
-
     <ol class="guide">
-      <li>Have a GitHub account, and be a <b>collaborator</b> on this repo. <span class="note">Second person: the owner adds you in repo <b>Settings &rarr; Collaborators</b>, and you accept the invite (check email / github.com notifications).</span></li>
+      <li>Have a GitHub account, and be a <b>collaborator</b> on this repo. <span class="note">New person: the owner adds you in repo <b>Settings &rarr; Collaborators</b>, and you accept the invite (check email / github.com notifications).</span></li>
       <li>Open the token page below (it pre-checks the right scope) and sign in.</li>
       <li>Set a <b>Note</b> and an expiration. Confirm <b>repo &rarr; public_repo</b> is checked.</li>
       <li>Click <b>Generate token</b>, copy it, paste below, and Save.</li>
     </ol>
-
     <a class="btnlink" href="https://github.com/settings/tokens/new?scopes=public_repo&amp;description=reading-group-archive" target="_blank" rel="noopener">Create a classic token &#8599;</a>
-
     <label>Paste token <span class="note">(a classic token, starts with <code>ghp_</code>)</span></label>
     <input id="f_token" type="password" placeholder="ghp_&hellip;">
     <div class="msg" id="tokenMsg"></div>
@@ -147,170 +124,93 @@
       <button id="tokenCancel">Cancel</button>
       <button class="primary" id="tokenSave">Save token</button>
     </div>
-    <p class="note" style="margin-top:14px">Use a <b>classic</b> token with the <code>public_repo</code> scope &mdash; a
-    fine-grained token cannot reach a collaborator&rsquo;s repo, which is why &ldquo;Only select repositories&rdquo; was empty.
-    The archive is a <b>public</b> file.</p>
+    <p class="note" style="margin-top:14px">Use a <b>classic</b> token with the <code>public_repo</code> scope so it works
+    for collaborators too. The archive is a <b>public</b> file.</p>
   </div>
 </div>
 
 <script>
-const OWNER="peterywon", REPO="peterywon.github.io", BRANCH="main", FILEPATH="reading-group/entries.json";
-const MEMBERS=["Peter","Hanjun"];
-let SHA=null, ENTRIES=[];
+const OWNER="peterywon",REPO="peterywon.github.io",BRANCH="main",FILEPATH="reading-group/entries.json";
+// Known members always show. Anyone else who adds an entry appears automatically (color from palette).
+const MEMBERS=[{name:"Peter",color:"#8b1a1a"},{name:"Hanjun",color:"#1a4a8b"}];
+const PALETTE=["#2e7d32","#8a6d3b","#6a1b9a","#00838f","#b8860b","#455a64","#ad1457"];
+let SHA=null,ENTRIES=[],VIEW="board";
 
 const $=id=>document.getElementById(id);
 const esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const tokenGet=()=>localStorage.getItem("rg_token")||"";
 const b64enc=s=>btoa(unescape(encodeURIComponent(s)));
 const b64dec=b=>decodeURIComponent(escape(atob(b.replace(/\s/g,""))));
+const byDate=(a,b)=>(b.date||"").localeCompare(a.date||"")||(b.ts||"").localeCompare(a.ts||"");
 
+function memberList(){
+  const map=new Map(MEMBERS.map(m=>[m.name,m.color])); let pi=0;
+  ENTRIES.forEach(e=>{if(e.author&&!map.has(e.author)) map.set(e.author,PALETTE[pi++%PALETTE.length]);});
+  return [...map.entries()].map(([name,color])=>({name,color}));
+}
+
+// ---- GitHub I/O ----
 async function loadFile(){
   const url=`https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILEPATH}?ref=${BRANCH}&t=${Date.now()}`;
-  const h={"Accept":"application/vnd.github+json"}; const t=tokenGet(); if(t) h["Authorization"]="Bearer "+t;
+  const h={"Accept":"application/vnd.github+json"};const t=tokenGet();if(t)h["Authorization"]="Bearer "+t;
   const r=await fetch(url,{headers:h,cache:"no-store"});
   if(r.status===404){SHA=null;ENTRIES=[];return;}
   if(!r.ok) throw new Error("Load failed ("+r.status+"). Rate limit? add a token or wait a minute.");
-  const j=await r.json(); SHA=j.sha;
+  const j=await r.json();SHA=j.sha;
   try{ENTRIES=JSON.parse(b64dec(j.content)||"[]");}catch(e){ENTRIES=[];}
 }
-
-async function saveEntry(entry){
-  const t=tokenGet(); if(!t){openToken();throw new Error("Set a GitHub token first.");}
-  await loadFile();                 // get freshest sha + entries
-  const next=ENTRIES.concat([entry]);
-  const body={message:`archive: ${entry.author} — ${entry.paper}`.slice(0,70),
-    content:b64enc(JSON.stringify(next,null,2)),branch:BRANCH};
-  if(SHA) body.sha=SHA;
-  const r=await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILEPATH}`,
-    {method:"PUT",headers:{"Authorization":"Bearer "+t,"Accept":"application/vnd.github+json"},body:JSON.stringify(body)});
-  if(!r.ok){
-    let m=r.status; try{m+=" "+(await r.json()).message;}catch(e){}
-    if(r.status===401) m="Bad or expired token.";
-    if(r.status===403||r.status===404) m="No write access — token needs Contents:write on this repo (and collaborator access).";
-    throw new Error("Save failed: "+m);
-  }
-  const j=await r.json(); SHA=j.content.sha; ENTRIES=next;
-}
-
-async function deleteEntry(id){
-  const t=tokenGet(); if(!t){openToken();throw new Error("Set a GitHub token first.");}
-  await loadFile();
-  const next=ENTRIES.filter(e=>e.id!==id);
-  const body={message:`archive: delete ${id}`.slice(0,70),content:b64enc(JSON.stringify(next,null,2)),branch:BRANCH};
-  if(SHA) body.sha=SHA;
+async function commit(next,message){
+  const t=tokenGet();if(!t){openToken();throw new Error("Set a GitHub token first.");}
+  const body={message:message.slice(0,70),content:b64enc(JSON.stringify(next,null,2)),branch:BRANCH};
+  if(SHA)body.sha=SHA;
   const r=await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILEPATH}`,
     {method:"PUT",headers:{"Authorization":"Bearer "+t,"Accept":"application/vnd.github+json"},body:JSON.stringify(body)});
   if(!r.ok){let m=r.status;try{m+=" "+(await r.json()).message;}catch(e){}
     if(r.status===401)m="Bad or expired token.";
-    if(r.status===403||r.status===404)m="No write access — token needs Contents:write.";
-    throw new Error("Delete failed: "+m);}
-  const j=await r.json(); SHA=j.content.sha; ENTRIES=next;
+    if(r.status===403||r.status===404)m="No write access — need collaborator + a classic token with public_repo.";
+    throw new Error("Save failed: "+m);}
+  const j=await r.json();SHA=j.content.sha;ENTRIES=next;
 }
+async function saveEntry(entry){await loadFile();await commit(ENTRIES.concat([entry]),`archive: ${entry.author} — ${entry.paper}`);}
+async function deleteEntry(id){await loadFile();await commit(ENTRIES.filter(e=>e.id!==id),`archive: delete ${id}`);}
 
-function render(){
-  const q=($("q").value||"").toLowerCase().trim();
-  const match=e=>!q||[e.paper,e.takeaway,e.best,e.idea,e.author].some(x=>(x||"").toLowerCase().includes(q));
-  MEMBERS.forEach(m=>{
-    const list=ENTRIES.filter(e=>e.author===m&&match(e))
-      .sort((a,b)=>(b.date||"").localeCompare(a.date||"")||(b.ts||"").localeCompare(a.ts||""));
-    $("n"+m).textContent=list.length?list.length:"";
-    const el=$("col"+m);
-    el.innerHTML=list.length?list.map(card).join(""):'<div class="empty">No entries yet.</div>';
-  });
-}
+// ---- boards ----
 function card(e){
   const row=(lab,v)=>v?`<div class="row"><b>${lab}</b>${esc(v)}</div>`:"";
-  return `<div class="card">
-    <button class="del" data-id="${esc(e.id)}" title="Delete this entry">&times;</button>
-    <div class="pp">${esc(e.paper)}</div>
-    <div class="dt">${esc(e.date||"")}</div>
-    ${row("Takeaway",e.takeaway)}${row("Best thing",e.best)}${row("Idea / question",e.idea)}
-  </div>`;
+  return `<div class="card"><button class="del" data-id="${esc(e.id)}" title="Delete this entry">&times;</button>
+    <div class="pp">${esc(e.paper)}</div><div class="dt">${esc(e.date||"")}</div>
+    ${row("Takeaway",e.takeaway)}${row("Best thing",e.best)}${row("Idea / question",e.idea)}</div>`;
+}
+function renderBoards(){
+  const q=($("q").value||"").toLowerCase().trim();
+  const match=e=>!q||[e.paper,e.takeaway,e.best,e.idea,e.author].some(x=>(x||"").toLowerCase().includes(q));
+  $("board").innerHTML=memberList().map(m=>{
+    const list=ENTRIES.filter(e=>e.author===m.name&&match(e)).sort(byDate);
+    return `<div class="col"><h2 style="color:${m.color};border-color:${m.color}">${esc(m.name)} <span class="n">${list.length||""}</span></h2>`
+      +(list.length?list.map(card).join(""):'<div class="empty">No entries yet.</div>')+'</div>';
+  }).join("");
 }
 
-// ---- modals ----
-function openAdd(){$("f_date").value=new Date().toISOString().slice(0,10);$("addMsg").textContent="";$("addScrim").classList.add("on");}
-function closeAdd(){$("addScrim").classList.remove("on");}
-function openToken(){$("f_token").value=tokenGet();$("tokenMsg").textContent="";$("tokenScrim").classList.add("on");}
-function closeToken(){$("tokenScrim").classList.remove("on");}
-
-$("addBtn").onclick=openAdd; $("addCancel").onclick=closeAdd;
-$("tokenBtn").onclick=openToken; $("tokenCancel").onclick=closeToken;
-$("refreshBtn").onclick=async()=>{try{await loadFile();render();}catch(e){alert(e.message);}};
-$("q").oninput=render;
-$("board").addEventListener("click",async(ev)=>{
-  const btn=ev.target.closest(".del"); if(!btn) return;
-  const id=btn.getAttribute("data-id"); const e=ENTRIES.find(x=>x.id===id);
-  if(!confirm("Delete this entry?\n\n"+(e?e.paper:""))) return;
-  btn.disabled=true;
-  try{ await deleteEntry(id); render(); }
-  catch(err){ alert(err.message); btn.disabled=false; }
-});
-$("tokenSave").onclick=()=>{localStorage.setItem("rg_token",$("f_token").value.trim());$("tokenMsg").className="msg ok";$("tokenMsg").textContent="Saved in this browser.";setTimeout(closeToken,700);};
-$("tokenClear").onclick=()=>{localStorage.removeItem("rg_token");$("f_token").value="";$("tokenMsg").className="msg ok";$("tokenMsg").textContent="Cleared.";};
-
-$("addSave").onclick=async()=>{
-  const paper=$("f_paper").value.trim();
-  if(!paper){$("addMsg").className="msg err";$("addMsg").textContent="Paper is required.";return;}
-  const entry={id:"e"+Date.now().toString(36),author:$("f_author").value,paper,
-    date:$("f_date").value||new Date().toISOString().slice(0,10),
-    takeaway:$("f_takeaway").value.trim(),best:$("f_best").value.trim(),idea:$("f_idea").value.trim(),
-    ts:new Date().toISOString()};
-  $("addMsg").className="msg"; $("addMsg").textContent="Saving…"; $("addSave").disabled=true;
-  try{
-    await saveEntry(entry);
-    ["f_paper","f_takeaway","f_best","f_idea"].forEach(i=>$(i).value="");
-    render(); closeAdd();
-  }catch(e){$("addMsg").className="msg err";$("addMsg").textContent=e.message;}
-  finally{$("addSave").disabled=false;}
-};
-
-// ---------- Insights ----------
-const STOP=new Set(("the a an and or but of to in on for with as at by is are was were be been it this that these those from into "+
-"than then when how what which who about can could would should do does did not no more most less very just also i we you they he she "+
-"its their our my me us them if so such per via using use used paper papers study studies result results finding findings effect effects "+
-"show shows shown find finds found author authors question contribution method methods data model models evidence analysis approach new one "+
-"two three each between across within over under after before during because however whether make made makes get gets got like well good best "+
-"thing things idea ideas take takeaway does out up down only than there here").split(/\s+/));
+// ---- insights ----
+const STOP=new Set(("the a an and or but of to in on for with as at by is are was were be been it this that these those from into than then when how what which who about can could would should do does did not no more most less very just also i we you they he she its their our my me us them if so such per via using use used paper papers study studies result results finding findings effect effects show shows shown find finds found author authors question contribution method methods data model models evidence analysis approach new one two three each between across within over under after before during because however whether make made makes get gets got like well good best thing things idea ideas take takeaway out up down only there here").split(/\s+/));
 function tokens(s){return (s||"").toLowerCase().replace(/[^a-z0-9\s-]/g," ").split(/\s+/)
   .map(w=>w.replace(/^-+|-+$/g,"")).filter(w=>w.length>=3&&!STOP.has(w))
   .map(w=>(w.length>4&&w.endsWith("s")&&!w.endsWith("ss"))?w.slice(0,-1):w);}
 function entryText(e){return [e.idea,e.takeaway,e.best,e.paper].join(" ");}
 
-function computeInsights(){
-  const el=$("insights");
-  if(!ENTRIES.length){el.innerHTML='<div class="empty">No entries yet — add a few and insights will appear here.</div>';return;}
-  const freq={Peter:{},Hanjun:{},all:{}}, nodePerson={};
-  ENTRIES.forEach(e=>{const who=freq[e.author]?e.author:null;
-    [...new Set(tokens(entryText(e)))].forEach(w=>{freq.all[w]=(freq.all[w]||0)+1;
-      if(who)freq[who][w]=(freq[who][w]||0)+1;
-      nodePerson[w]=nodePerson[w]||{Peter:0,Hanjun:0}; if(who)nodePerson[w][who]++;});});
-  const byMonth={}; ENTRIES.forEach(e=>{const m=(e.date||"").slice(0,7); if(m)byMonth[m]=(byMonth[m]||0)+1;});
-  const tiles=[["Papers",ENTRIES.length],["Peter",ENTRIES.filter(e=>e.author==="Peter").length],
-    ["Hanjun",ENTRIES.filter(e=>e.author==="Hanjun").length],
-    ["This month",byMonth[new Date().toISOString().slice(0,7)]||0],["Keywords",Object.keys(freq.all).length]];
-  const cloud=who=>{const arr=Object.entries(freq[who]).sort((a,b)=>b[1]-a[1]).slice(0,28);
-    if(!arr.length)return '<div class="empty">No keywords yet.</div>';
-    const max=arr[0][1], col=who==="Peter"?"var(--peter)":"var(--hanjun)";
-    return arr.map(([w,c])=>{const sz=13+Math.round(20*Math.sqrt(c/max));
-      return `<span class="w" style="font-size:${sz}px;color:${col};opacity:${(0.55+0.45*c/max).toFixed(2)}" title="${c}">${esc(w)}</span>`;}).join("");};
-  const top=Object.entries(freq.all).sort((a,b)=>b[1]-a[1]).slice(0,20).map(x=>x[0]);
+function buildGraph(entries,opts){
+  opts=opts||{};const N=opts.N||18,W=opts.W||900,H=opts.H||360,E=opts.E||30;
+  const freq={},np={};
+  entries.forEach(e=>{[...new Set(tokens(entryText(e)))].forEach(w=>{freq[w]=(freq[w]||0)+1;np[w]=np[w]||{};np[w][e.author]=(np[w][e.author]||0)+1;});});
+  const top=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,N).map(x=>x[0]);
+  if(top.length<2)return '<div class="empty" style="padding:14px">Add a few more entries to grow the map.</div>';
   const idx=new Map(top.map((w,i)=>[w,i]));
-  const nodes=top.map(w=>({w,freq:freq.all[w],P:nodePerson[w].Peter,H:nodePerson[w].Hanjun}));
+  const nodes=top.map(w=>({w,freq:freq[w],np:np[w]}));
   const pairs={};
-  ENTRIES.forEach(e=>{const ts=[...new Set(tokens(entryText(e)))].filter(w=>idx.has(w));
+  entries.forEach(e=>{const ts=[...new Set(tokens(entryText(e)))].filter(w=>idx.has(w));
     for(let i=0;i<ts.length;i++)for(let j=i+1;j<ts.length;j++){const k=[ts[i],ts[j]].sort().join("|");pairs[k]=(pairs[k]||0)+1;}});
-  const edges=Object.entries(pairs).map(([k,w])=>{const[x,y]=k.split("|");return{a:idx.get(x),b:idx.get(y),w};})
-    .sort((a,b)=>b.w-a.w).slice(0,32);
-  el.innerHTML='<div class="tiles">'+tiles.map(t=>`<div class="tile"><div class="v">${t[1]}</div><div class="k">${t[0]}</div></div>`).join("")+'</div>'
-    +'<div class="section-title">Keyword map &mdash; ideas that show up together</div><div class="graphwrap">'+graphSVG(nodes,edges)+'</div>'
-    +'<div class="section-title">Most frequent keywords</div>'
-    +'<div class="cloud"><h3 style="color:var(--peter)">Peter</h3>'+cloud("Peter")+'</div>'
-    +'<div class="cloud"><h3 style="color:var(--hanjun)">Hanjun</h3>'+cloud("Hanjun")+'</div>';
-}
-function graphSVG(nodes,edges){
-  if(nodes.length<2)return '<div class="empty" style="padding:14px">Add more entries to grow the keyword map.</div>';
-  const W=900,H=380,cx=W/2,cy=H/2,R=Math.min(W,H)/2-46;
+  const edges=Object.entries(pairs).map(([k,w])=>{const[x,y]=k.split("|");return{a:idx.get(x),b:idx.get(y),w};}).sort((a,b)=>b.w-a.w).slice(0,E);
+  const cx=W/2,cy=H/2,R=Math.min(W,H)/2-46;
   nodes.forEach((n,i)=>{const a=2*Math.PI*i/nodes.length;n.x=cx+R*Math.cos(a);n.y=cy+R*Math.sin(a);n.vx=0;n.vy=0;});
   for(let it=0;it<220;it++){
     for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){
@@ -318,33 +218,100 @@ function graphSVG(nodes,edges){
       nodes[i].vx+=fx;nodes[i].vy+=fy;nodes[j].vx-=fx;nodes[j].vy-=fy;}
     edges.forEach(e=>{const a=nodes[e.a],b=nodes[e.b];let dx=b.x-a.x,dy=b.y-a.y,d=Math.sqrt(dx*dx+dy*dy)+0.01,f=(d-110)*0.02*Math.min(3,e.w),fx=f*dx/d,fy=f*dy/d;
       a.vx+=fx;a.vy+=fy;b.vx-=fx;b.vy-=fy;});
-    nodes.forEach(n=>{n.vx+=(cx-n.x)*0.003;n.vy+=(cy-n.y)*0.003;
-      n.x+=Math.max(-9,Math.min(9,n.vx));n.y+=Math.max(-9,Math.min(9,n.vy));n.vx*=0.84;n.vy*=0.84;
-      n.x=Math.max(44,Math.min(W-44,n.x));n.y=Math.max(28,Math.min(H-24,n.y));});}
-  const maxf=Math.max.apply(null,nodes.map(n=>n.freq));
-  const col=n=>n.P>n.H?"#8b1a1a":n.H>n.P?"#1a4a8b":"#8a6d3b";
+    nodes.forEach(n=>{n.vx+=(cx-n.x)*0.003;n.vy+=(cy-n.y)*0.003;n.x+=Math.max(-9,Math.min(9,n.vx));n.y+=Math.max(-9,Math.min(9,n.vy));n.vx*=0.84;n.vy*=0.84;
+      n.x=Math.max(44,Math.min(W-44,n.x));n.y=Math.max(26,Math.min(H-22,n.y));});}
+  const maxf=Math.max.apply(null,nodes.map(n=>n.freq)),mem=memberList();
+  const dom=n=>{let best=null,bc=0;mem.forEach(m=>{const c=(n.np[m.name]||0);if(c>bc){bc=c;best=m;}});return best?best.color:"#8a6d3b";};
+  const color=opts.color||dom;
   let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:100%;height:auto;font-family:Inter,sans-serif">`;
-  edges.forEach(e=>{const a=nodes[e.a],b=nodes[e.b];
-    s+=`<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}" stroke="#c9ccd0" stroke-width="${Math.min(3,0.6+e.w*0.6).toFixed(1)}" stroke-opacity="0.7"/>`;});
+  edges.forEach(e=>{const a=nodes[e.a],b=nodes[e.b];s+=`<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}" stroke="#c9ccd0" stroke-width="${Math.min(3,0.6+e.w*0.6).toFixed(1)}" stroke-opacity="0.7"/>`;});
   nodes.forEach(n=>{const r=6+Math.round(12*Math.sqrt(n.freq/maxf));
-    s+=`<circle cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="${r}" fill="${col(n)}" fill-opacity="0.85"/>`;
-    s+=`<text x="${n.x.toFixed(1)}" y="${(n.y-r-4).toFixed(1)}" text-anchor="middle" font-size="12" fill="#1c1c1c">${esc(n.w)}</text>`;});
-  return s+`</svg>`;}
-let VIEW="board";
+    s+=`<circle cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="${r}" fill="${color(n)}" fill-opacity="0.85"/><text x="${n.x.toFixed(1)}" y="${(n.y-r-4).toFixed(1)}" text-anchor="middle" font-size="12" fill="#1c1c1c">${esc(n.w)}</text>`;});
+  return s+`</svg>`;
+}
+function cloudFor(m){
+  const f={};ENTRIES.filter(e=>e.author===m.name).forEach(e=>[...new Set(tokens(entryText(e)))].forEach(w=>f[w]=(f[w]||0)+1));
+  const arr=Object.entries(f).sort((a,b)=>b[1]-a[1]).slice(0,26);
+  if(!arr.length)return '<div class="empty">No keywords yet.</div>';
+  const max=arr[0][1];
+  return arr.map(([w,c])=>`<span class="w" style="font-size:${13+Math.round(20*Math.sqrt(c/max))}px;color:${m.color};opacity:${(0.55+0.45*c/max).toFixed(2)}" title="${c}">${esc(w)}</span>`).join("");
+}
+function computeInsights(){
+  const el=$("insights"),mem=memberList();
+  if(!ENTRIES.length){el.innerHTML='<div class="empty">No entries yet — add a few and insights will appear here.</div>';return;}
+  const tm=new Date().toISOString().slice(0,7);
+  const kw=new Set();ENTRIES.forEach(e=>tokens(entryText(e)).forEach(w=>kw.add(w)));
+  const tiles=[["Papers",ENTRIES.length]]
+    .concat(mem.map(m=>[m.name,ENTRIES.filter(e=>e.author===m.name).length]))
+    .concat([["This month",ENTRIES.filter(e=>(e.date||"").slice(0,7)===tm).length],["Keywords",kw.size]]);
+  el.innerHTML='<div class="tiles">'+tiles.map(t=>`<div class="tile"><div class="v">${t[1]}</div><div class="k">${esc(String(t[0]))}</div></div>`).join("")+'</div>'
+    +'<div class="section-title">Keyword map &mdash; ideas that show up together (everyone)</div><div class="graphwrap">'+buildGraph(ENTRIES,{})+'</div>'
+    +'<div class="section-title">Each person&rsquo;s own map</div><div class="maps">'
+      +mem.map(m=>`<div class="mapcard"><h3 style="color:${m.color}">${esc(m.name)}</h3>`+buildGraph(ENTRIES.filter(e=>e.author===m.name),{color:()=>m.color,W:460,H:300,N:14,E:22})+'</div>').join("")
+      +'</div>'
+    +'<div class="section-title">Most frequent keywords</div>'
+      +mem.map(m=>`<div class="cloud"><h3 style="color:${m.color}">${esc(m.name)}</h3>`+cloudFor(m)+'</div>').join("");
+}
+
+function refreshView(){ VIEW==="insights"?computeInsights():renderBoards(); }
 function showView(v){VIEW=v;
   $("board").style.display=v==="board"?"":"none";
   $("insights").style.display=v==="insights"?"block":"none";
   $("q").style.display=v==="board"?"":"none";
   $("viewBtn").innerHTML=v==="board"?"&#128202; Insights":"&#9776; Boards";
-  if(v==="insights")computeInsights();}
+  refreshView();
+}
+
+// ---- modals ----
+function openAdd(){
+  const mem=memberList();
+  $("memberDL").innerHTML=mem.map(m=>`<option value="${esc(m.name)}">`).join("");
+  $("f_author").value=localStorage.getItem("rg_me")||(mem[0]&&mem[0].name)||"";
+  $("f_date").value=new Date().toISOString().slice(0,10);
+  $("addMsg").textContent="";$("addScrim").classList.add("on");
+}
+function closeAdd(){$("addScrim").classList.remove("on");}
+function openToken(){$("f_token").value=tokenGet();$("tokenMsg").textContent="";$("tokenScrim").classList.add("on");}
+function closeToken(){$("tokenScrim").classList.remove("on");}
+
+$("addBtn").onclick=openAdd; $("addCancel").onclick=closeAdd;
+$("tokenBtn").onclick=openToken; $("tokenCancel").onclick=closeToken;
 $("viewBtn").onclick=()=>showView(VIEW==="board"?"insights":"board");
+$("refreshBtn").onclick=async()=>{try{await loadFile();refreshView();}catch(e){alert(e.message);}};
+$("q").oninput=renderBoards;
+$("tokenSave").onclick=()=>{localStorage.setItem("rg_token",$("f_token").value.trim());$("tokenMsg").className="msg ok";$("tokenMsg").textContent="Saved in this browser.";setTimeout(closeToken,700);};
+$("tokenClear").onclick=()=>{localStorage.removeItem("rg_token");$("f_token").value="";$("tokenMsg").className="msg ok";$("tokenMsg").textContent="Cleared.";};
+
+$("board").addEventListener("click",async(ev)=>{
+  const btn=ev.target.closest(".del");if(!btn)return;
+  const id=btn.getAttribute("data-id"),e=ENTRIES.find(x=>x.id===id);
+  if(!confirm("Delete this entry?\n\n"+(e?e.paper:"")))return;
+  btn.disabled=true;
+  try{await deleteEntry(id);refreshView();}catch(err){alert(err.message);btn.disabled=false;}
+});
+
+$("addSave").onclick=async()=>{
+  const paper=$("f_paper").value.trim(),author=$("f_author").value.trim();
+  if(!author){$("addMsg").className="msg err";$("addMsg").textContent="Please enter your name.";return;}
+  if(!paper){$("addMsg").className="msg err";$("addMsg").textContent="Paper is required.";return;}
+  const entry={id:"e"+Date.now().toString(36),author,paper,
+    date:$("f_date").value||new Date().toISOString().slice(0,10),
+    takeaway:$("f_takeaway").value.trim(),best:$("f_best").value.trim(),idea:$("f_idea").value.trim(),ts:new Date().toISOString()};
+  $("addMsg").className="msg";$("addMsg").textContent="Saving…";$("addSave").disabled=true;
+  try{
+    await saveEntry(entry);localStorage.setItem("rg_me",author);
+    ["f_paper","f_takeaway","f_best","f_idea"].forEach(i=>$(i).value="");
+    refreshView();closeAdd();
+  }catch(e){$("addMsg").className="msg err";$("addMsg").textContent=e.message;}
+  finally{$("addSave").disabled=false;}
+};
 
 (async function init(){
   $("foot").innerHTML='Data lives in <code>reading-group/entries.json</code> in the '+
-    '<a href="https://github.com/'+OWNER+'/'+REPO+'" target="_blank" rel="noopener">GitHub repo</a> &mdash; '+
-    'version-controlled and searchable. Prefer editing the file directly? You can, on GitHub.';
+    '<a href="https://github.com/'+OWNER+'/'+REPO+'" target="_blank" rel="noopener">GitHub repo</a> &mdash; version-controlled and searchable. '+
+    'To add another person: the owner adds them as a repo collaborator; then they just type their name when adding an entry.';
   try{await loadFile();}catch(e){$("foot").innerHTML='<span style="color:#b3261e">'+esc(e.message)+'</span>';}
-  render();
+  renderBoards();
 })();
 </script>
 </body>
