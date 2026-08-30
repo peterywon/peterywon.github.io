@@ -40,5 +40,21 @@
     "finding": "Anomaly returns are most consistent with mispricing explanations. Anomaly returns are 50% higher on corporate news days and 6 times higher on earnings announcement days.",
     "remember": "Follow the original literature to construct the anomaly portfolio. \"Net\" Variable (Long - Short).",
     "contribution": "incredible"
+  },
+  {
+    "id": "emtgdgp9s",
+    "ts": "2026-08-30T22:19:30.928Z",
+    "author": "Peter",
+    "title": "Artificial Intelligence, firm growth, and product innovation",
+    "authors": "Babina, Fedyk, He, and Hodson",
+    "journal": "JFE",
+    "year": "2024",
+    "area": "FinTech, AI & Data",
+    "subarea": "AI / ML in finance",
+    "date": "2026-08-21",
+    "rq": "Does the adoption of AI technology provide growth opportunity of firm?",
+    "finding": "1. Firm with higher AI investment experience higher growth in sales, employment, and market valuation.\n2. AI is a general purpose technology.\n3. It is driven by product innovation.",
+    "remember": "What would be the negative/down side of AI adoption in firms? Any tradeoff?",
+    "contribution": null
   }
 ]
