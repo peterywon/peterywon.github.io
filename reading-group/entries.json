@@ -24,5 +24,21 @@
     "best": "The striking result is that a trivial martingale rule—essentially carrying forward the prior-quarter ranking—matches sophisticated ML at about 72% F1, while the rare forecast misses generate disproportionately large returns.",
     "idea": "Can cross-sectional differences in signal predictability/persistence explain where anomaly profits survive—i.e., are the economically important returns increasingly tied to information that cannot be anticipated from stale signals?",
     "ts": "2026-08-20T03:49:13.365Z"
+  },
+  {
+    "id": "emtgddzpi",
+    "ts": "2026-08-30T22:17:24.486Z",
+    "author": "Hanjun",
+    "title": "Anomalies and News",
+    "authors": "Engelberg, Mclean, and Pontiff",
+    "journal": "Journal of Finance",
+    "year": "2018",
+    "area": "Asset Pricing",
+    "subarea": "Cross-section & anomalies",
+    "date": "2026-08-22",
+    "rq": "What drives anomaly returns?",
+    "finding": "Anomaly returns are most consistent with mispricing explanations. Anomaly returns are 50% higher on corporate news days and 6 times higher on earnings announcement days.",
+    "remember": "Follow the original literature to construct the anomaly portfolio. \"Net\" Variable (Long - Short).",
+    "contribution": "incredible"
   }
 ]
