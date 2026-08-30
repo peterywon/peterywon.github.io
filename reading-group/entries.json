@@ -56,5 +56,21 @@
     "finding": "1. Firm with higher AI investment experience higher growth in sales, employment, and market valuation.\n2. AI is a general purpose technology.\n3. It is driven by product innovation.",
     "remember": "What would be the negative/down side of AI adoption in firms? Any tradeoff?",
     "contribution": null
+  },
+  {
+    "id": "emtgdjxzd",
+    "ts": "2026-08-30T22:22:02.185Z",
+    "author": "Peter",
+    "title": "Two-sided Network Effects: A Theory of Information Product Design",
+    "authors": "Parker and Alstyne",
+    "journal": "MS",
+    "year": "2005",
+    "area": "FinTech, AI & Data",
+    "subarea": "FinTech & platforms",
+    "date": "2026-08-29",
+    "rq": "What is the strategic pricing behavior and product design in network market?",
+    "finding": "1. Free goods market can exist when cross-market network externality's benefit outweigh the cost of it.\n2. Consumer surplus is positive when firm gains at the same time.",
+    "remember": "",
+    "contribution": null
   }
 ]
