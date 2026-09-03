@@ -72,5 +72,21 @@
     "finding": "1. Free goods market can exist when cross-market network externality's benefit outweigh the cost of it.\n2. Consumer surplus is positive when firm gains at the same time.",
     "remember": "",
     "contribution": null
+  },
+  {
+    "id": "emtm2cjo5",
+    "ts": "2026-09-03T21:54:58.325Z",
+    "author": "Hanjun",
+    "title": "Persistent and transitory component of firm characteristic: Implications for asset pricing",
+    "authors": "Baba-Yara, Boons, and Tamoni",
+    "journal": "JFE",
+    "year": "2024",
+    "area": "Asset Pricing",
+    "subarea": "Cross-section & anomalies",
+    "date": "2026-08-29",
+    "rq": "Which component is dominant in explaining anomaly returns? persistent vs. transitory component of firm characteristics.",
+    "finding": "The relative compensation for persistent and transitory component varies strongly across characteristics.",
+    "remember": "They use 56 anomalies, and use new/old stocks sort inside the original anomaly portfolios.",
+    "contribution": "incremental"
   }
 ]
