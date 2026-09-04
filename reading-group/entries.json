@@ -103,6 +103,6 @@
     "rq": "Does takeover announcement affect the productivity of knowledge workers?",
     "finding": "1. takeover announcement decrease worker productivity and code quality. \n2. Channel: stress and anxiety is the reason. The impact they found is stronger when layoff probability is higher",
     "remember": "Code quality measure",
-    "contribution": null
+    "contribution": "incremental"
   }
 ]
