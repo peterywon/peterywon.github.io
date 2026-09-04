@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Paper Reading Group — Archive</title>
+<title>Utah Finance Reading Collective</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -13,7 +13,10 @@
   body{margin:0;background:var(--bg);color:var(--ink);font-family:"Source Serif 4",Georgia,serif;font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;}
   .wrap{max-width:1000px;margin:0 auto;padding:28px 20px 80px;}
   h1{font-size:1.5rem;margin:0 0 2px;}
-  .sub{color:var(--muted);font-size:.92rem;font-family:"Inter",sans-serif;margin:0 0 18px;}
+  .sub{color:var(--muted);font-size:.92rem;font-family:"Inter",sans-serif;margin:0 0 12px;max-width:760px;}
+  .founders{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 22px;font-family:"Inter",sans-serif;}
+  .sitebtn{display:inline-flex;align-items:center;gap:5px;text-decoration:none;font-size:.82rem;font-weight:600;color:var(--c);border:1px solid var(--c);border-radius:20px;padding:6px 14px;background:#fff;}
+  .sitebtn:hover{background:var(--c);color:#fff;}
   .bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 22px;font-family:"Inter",sans-serif;}
   .bar input[type=search]{flex:1 1 240px;min-width:200px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--card);}
   .bar select{padding:8px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--card);}
@@ -74,12 +77,37 @@
   .cloud .w{display:inline-block;margin:1px 9px 1px 0;font-weight:600;}
   .maps{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px;}
   .maps .mapcard{margin:0;}
+  /* coverage map */
+  .cov{font-family:"Inter",sans-serif;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:0 0 12px;}
+  .barrow{display:flex;align-items:center;gap:10px;margin:5px 0;font-size:.82rem;}
+  .barrow .lab{flex:0 0 180px;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .barrow .lab.zero{color:#bcbcbc;}
+  .barrow .track{flex:1;background:#f1efec;border-radius:5px;height:15px;display:flex;overflow:hidden;}
+  .barrow .seg{height:100%;}
+  .barrow .cnt{flex:0 0 22px;color:var(--muted);font-size:.76rem;text-align:left;}
+  .covleg{font-size:.72rem;color:var(--muted);margin-top:8px;display:flex;gap:14px;flex-wrap:wrap;}
+  .covleg span{display:inline-flex;align-items:center;gap:5px;}
+  .covleg i{width:10px;height:10px;border-radius:2px;display:inline-block;}
+  /* ideas bank */
+  .idea{border:1px solid var(--line);border-left:3px solid var(--c,#888);border-radius:8px;padding:8px 12px;margin:0 0 8px;background:var(--card);}
+  .idea .t{font-size:.95rem;line-height:1.45;}
+  .idea .src{font-family:"Inter",sans-serif;font-size:.72rem;color:var(--muted);margin-top:3px;}
+  .idea .who{font-weight:600;}
+  /* best-of */
+  .best{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--c,#888);border-radius:8px;padding:9px 12px;margin:0 0 8px;}
+  .best .bt{font-weight:700;}
+  .best .bm{font-family:"Inter",sans-serif;font-size:.74rem;color:var(--muted);margin:1px 0 4px;}
+  .best .bf{font-size:.9rem;}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>Paper Reading Group &mdash; Archive</h1>
-  <p class="sub">One short card per paper. Analog in the room; two minutes here afterward.</p>
+  <h1>Utah Finance Reading Collective</h1>
+  <p class="sub">A shared vault of the papers we read together &mdash; founded by <b>Peter</b> &amp; <b>Hanjun</b>, two finance PhD students at Utah who like digging into digital platforms, AI, asset pricing, and anything with a sharp idea. One short card per paper; analog in the room, two minutes here afterward.</p>
+  <div class="founders">
+    <a class="sitebtn" href="https://peterywon.github.io/" target="_blank" rel="noopener" style="--c:#8b1a1a">&#127968; Peter&rsquo;s site &#8599;</a>
+    <a class="sitebtn" href="https://sites.google.com/view/hanjunkim/home" target="_blank" rel="noopener" style="--c:#1a4a8b">&#127968; Hanjun&rsquo;s site &#8599;</a>
+  </div>
 
   <div class="bar">
     <select id="whoami" title="Who am I? — enables deleting your own cards"></select>
@@ -368,19 +396,49 @@ function computeInsights(){
   const tiles=[["Papers",ENTRIES.length]]
     .concat(mem.map(m=>[m.name,ENTRIES.filter(e=>e.author===m.name).length]))
     .concat([["This month",ENTRIES.filter(e=>(e.date||"").slice(0,7)===tm).length],["Keywords",kw.size]]);
-  const ac={};ENTRIES.forEach(e=>{if(e.area)ac[e.area]=(ac[e.area]||0)+1;});
-  const areaTags=Object.entries(ac).sort((a,b)=>b[1]-a[1]).map(([a,n])=>`<span class="tag area">${esc(a)} · ${n}</span>`).join("");
+  const colorOf=name=>{const m=mem.find(x=>x.name===name);return m?m.color:"#888";};
+
+  // 1) Coverage map — stacked-by-person bars per FMA area, gaps surfaced
+  const perArea=Object.keys(AREAS).map(a=>{
+    const byM=mem.map(m=>({name:m.name,color:m.color,n:ENTRIES.filter(e=>e.area===a&&e.author===m.name).length}));
+    return {a,byM,total:byM.reduce((s,x)=>s+x.n,0)};
+  });
+  const maxTot=Math.max(1,...perArea.map(x=>x.total));
+  const covered=perArea.filter(x=>x.total>0).sort((a,b)=>b.total-a.total||a.a.localeCompare(b.a));
+  const gaps=perArea.filter(x=>x.total===0).map(x=>x.a);
+  const covRows=covered.map(x=>{
+    const segs=x.byM.filter(s=>s.n>0).map(s=>`<div class="seg" style="width:${(s.n/maxTot*100).toFixed(1)}%;background:${s.color}" title="${esc(s.name)}: ${s.n}"></div>`).join("");
+    return `<div class="barrow"><div class="lab" title="${esc(x.a)}">${esc(x.a)}</div><div class="track">${segs}</div><div class="cnt">${x.total}</div></div>`;
+  }).join("");
+  const legend='<div class="covleg">'+mem.map(m=>`<span><i style="background:${m.color}"></i>${esc(m.name)}</span>`).join("")+'</div>';
+  const gapLine=gaps.length?`<div class="covleg" style="margin-top:6px"><b>Gaps (0 read):</b> ${gaps.map(esc).join(" · ")}</div>`:"";
+  const covHTML='<div class="cov">'+(covRows||'<div class="empty">No areas tagged yet.</div>')+legend+gapLine+'</div>';
+
+  // 2) Ideas & open questions bank — the Remember / Idea fields, our seed bank
+  const ideaItems=ENTRIES.map(e=>({e,txt:(e.remember||e.idea||"").trim()})).filter(x=>x.txt).sort((a,b)=>byDate(a.e,b.e));
+  const ideasHTML=ideaItems.length?ideaItems.map(({e,txt})=>{
+    const src=[e.title||e.paper,[e.journal,e.year].filter(Boolean).join(" ")].filter(Boolean).join(" · ");
+    return `<div class="idea" style="--c:${colorOf(e.author)}"><div class="t">${esc(txt)}</div><div class="src"><span class="who" style="color:${colorOf(e.author)}">${esc(e.author)}</span> &middot; ${esc(src)}</div></div>`;
+  }).join(""):'<div class="empty">No notes yet — fill the &ldquo;Remember&rdquo; field when adding a paper.</div>';
+
+  // 3) Best-of — papers rated incredible / incremental, worth revisiting
   const cc={};ENTRIES.forEach(e=>{if(e.contribution)cc[e.contribution]=(cc[e.contribution]||0)+1;});
   const contribTags=CONTRIB.filter(([v])=>cc[v]).map(([v,c])=>`<span class="tag" style="background:${c}">${v} · ${cc[v]}</span>`).join("");
+  const rank={incredible:0,incremental:1};
+  const best=ENTRIES.filter(e=>e.contribution==="incredible"||e.contribution==="incremental")
+    .sort((a,b)=>(rank[a.contribution]-rank[b.contribution])||byDate(a,b));
+  const bestHTML=best.length?best.map(e=>{
+    const meta=[e.authors,[e.journal,e.year].filter(Boolean).join(" "),e.author].filter(Boolean).join(" · ");
+    return `<div class="best" style="--c:${colorOf(e.author)}"><div class="bt">${esc(e.title||e.paper||"")} ${contribBadge(e)}</div><div class="bm">${esc(meta)}</div>`
+      +((e.finding||e.best)?`<div class="bf">${esc(e.finding||e.best)}</div>`:"")+`</div>`;
+  }).join(""):'<div class="empty">Rate a paper &ldquo;incredible&rdquo; or &ldquo;incremental&rdquo; and it’ll collect here.</div>';
+
   el.innerHTML='<div class="tiles">'+tiles.map(t=>`<div class="tile"><div class="v">${t[1]}</div><div class="k">${esc(String(t[0]))}</div></div>`).join("")+'</div>'
-    +(areaTags?'<div class="section-title">By area</div><div class="tagrow">'+areaTags+'</div>':'')
-    +(contribTags?'<div class="section-title">Contribution mix</div><div class="tagrow">'+contribTags+'</div>':'')
-    +'<div class="section-title">Keyword map &mdash; ideas that show up together (everyone)</div><div class="graphwrap">'+buildGraph(ENTRIES,{})+'</div>'
-    +'<div class="section-title">Each person&rsquo;s own map</div><div class="maps">'
-      +mem.map(m=>`<div class="mapcard"><h3 style="color:${m.color}">${esc(m.name)}</h3>`+buildGraph(ENTRIES.filter(e=>e.author===m.name),{color:()=>m.color,W:460,H:300,N:14,E:22})+'</div>').join("")
-      +'</div>'
-    +'<div class="section-title">Most frequent keywords</div>'
-      +mem.map(m=>`<div class="cloud"><h3 style="color:${m.color}">${esc(m.name)}</h3>`+cloudFor(m)+'</div>').join("");
+    +'<div class="section-title">Coverage &mdash; what we&rsquo;ve read, and where the gaps are</div>'+covHTML
+    +'<div class="section-title">Ideas &amp; open questions &mdash; our research seed bank</div>'+ideasHTML
+    +'<div class="section-title">Best of &mdash; papers worth revisiting</div>'
+    +(contribTags?'<div class="tagrow" style="margin:-2px 0 10px">'+contribTags+'</div>':'')
+    +bestHTML;
 }
 
 function refreshView(){ VIEW==="insights"?computeInsights():renderBoards(); }
