@@ -88,5 +88,21 @@
     "finding": "The relative compensation for persistent and transitory component varies strongly across characteristics.",
     "remember": "They use 56 anomalies, and use new/old stocks sort inside the original anomaly portfolios.",
     "contribution": "incremental"
+  },
+  {
+    "id": "emtnfuc85",
+    "ts": "2026-09-04T21:00:29.669Z",
+    "author": "Peter",
+    "title": "Takeovers and Knowledge Worker Productivity",
+    "authors": "Danis, Gushchin, and Thies",
+    "journal": "SSRN",
+    "year": "2026",
+    "area": "Corporate Finance",
+    "subarea": "M&A",
+    "date": "2026-09-04",
+    "rq": "Does takeover announcement affect the productivity of knowledge workers?",
+    "finding": "1. takeover announcement decrease worker productivity and code quality. \n2. Channel: stress and anxiety is the reason. The impact they found is stronger when layoff probability is higher",
+    "remember": "Code quality measure",
+    "contribution": null
   }
 ]
