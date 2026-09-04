@@ -205,7 +205,15 @@ const me=()=>localStorage.getItem("rg_me")||"";
 function fillWhoami(){const mem=memberList();
   $("whoami").innerHTML='<option value="">— I&rsquo;m&hellip; —</option>'+mem.map(m=>`<option ${m.name===me()?"selected":""}>${esc(m.name)}</option>`).join("");}
 
+// Reads go straight to the static file GitHub Pages serves — no API, no rate limit, no token.
 async function loadFile(){
+  const r=await fetch(`./entries.json?t=${Date.now()}`,{cache:"no-store"});
+  if(r.status===404){SHA=null;ENTRIES=[];return;}
+  if(!r.ok) throw new Error("Load failed ("+r.status+").");
+  try{const j=await r.json();ENTRIES=Array.isArray(j)?j:[];}catch(e){ENTRIES=[];}
+}
+// Writes need the file's current blob SHA and freshest content — via the API, always with a token.
+async function loadFileApi(){
   const url=`https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILEPATH}?ref=${BRANCH}&t=${Date.now()}`;
   const h={"Accept":"application/vnd.github+json"};const t=tokenGet();if(t)h["Authorization"]="Bearer "+t;
   const r=await fetch(url,{headers:h,cache:"no-store"});
@@ -226,8 +234,8 @@ async function commit(next,message){
     throw new Error("Save failed: "+m);}
   const j=await r.json();SHA=j.content.sha;ENTRIES=next;
 }
-async function saveEntry(entry){await loadFile();await commit(ENTRIES.concat([entry]),`archive: ${entry.author} — ${entry.title||entry.paper}`);}
-async function deleteEntry(id){await loadFile();await commit(ENTRIES.filter(e=>e.id!==id),`archive: delete ${id}`);}
+async function saveEntry(entry){await loadFileApi();await commit(ENTRIES.concat([entry]),`archive: ${entry.author} — ${entry.title||entry.paper}`);}
+async function deleteEntry(id){await loadFileApi();await commit(ENTRIES.filter(e=>e.id!==id),`archive: delete ${id}`);}
 
 // ---- per-user passwords (soft gate on edit/delete) ----
 async function loadUsers(){
@@ -467,7 +475,7 @@ $("addSave").onclick=async()=>{
   $("addMsg").className="msg";$("addMsg").textContent="Saving…";$("addSave").disabled=true;
   try{
     if(editingId){
-      await loadFile();
+      await loadFileApi();
       const arr=ENTRIES.map(x=>{ if(x.id!==editingId) return x;
         const u=Object.assign({},x,base,{id:editingId}); ["takeaway","best","idea","paper"].forEach(k=>delete u[k]); return u; });
       await commit(arr,`archive: edit ${author} — ${title}`);
