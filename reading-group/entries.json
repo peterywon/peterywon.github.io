@@ -104,5 +104,21 @@
     "finding": "1. takeover announcement decrease worker productivity and code quality. \n2. Channel: stress and anxiety is the reason. The impact they found is stronger when layoff probability is higher",
     "remember": "Code quality measure",
     "contribution": "incremental"
+  },
+  {
+    "id": "emtoudifq",
+    "ts": "2026-09-05T20:35:04.982Z",
+    "author": "Hanjun",
+    "title": "Evidence on the characteristics of cross sectional variation in stock returns",
+    "authors": "Daniel and Titman",
+    "journal": "Journal of Finance",
+    "year": "1997",
+    "area": "Asset Pricing",
+    "subarea": "Cross-section & anomalies",
+    "date": "2026-09-04",
+    "rq": "Is every anomaly (i.e., firm characteristic) a priced factor?",
+    "finding": "High returns of the BM portfolio can't be viewed as compensation for factor risk.",
+    "remember": "Three models, 3-way sorts (BM, size, HML loading)",
+    "contribution": "incredible"
   }
 ]
