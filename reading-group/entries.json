@@ -136,5 +136,21 @@
     "finding": "1. Open models are underutilized by consumers compared to closed models.\n2. Quantify the economic value of underutilization, and 70% of the total market spending could be saved.",
     "remember": "Openrouter, Measure of quantifying the economic scale of the closed model.",
     "contribution": "marginal"
+  },
+  {
+    "id": "emu7g4p0y",
+    "ts": "2026-09-18T21:03:56.338Z",
+    "author": "Chunyuan",
+    "title": "A five-factor asset pricing model",
+    "authors": "Fama & French",
+    "journal": "JFE",
+    "year": "2014",
+    "area": "Asset Pricing",
+    "subarea": "Factor models",
+    "date": "2026-09-18",
+    "rq": "",
+    "finding": "",
+    "remember": "",
+    "contribution": null
   }
 ]
