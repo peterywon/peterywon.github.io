@@ -120,5 +120,21 @@
     "finding": "High returns of the BM portfolio can't be viewed as compensation for factor risk.",
     "remember": "Three models, 3-way sorts (BM, size, HML loading)",
     "contribution": "incredible"
+  },
+  {
+    "id": "emu69e8wi",
+    "ts": "2026-09-18T01:07:38.514Z",
+    "author": "Peter",
+    "title": "Latent Role of Open Models in the AI Economy",
+    "authors": "Nagel & Yue",
+    "journal": "SSRN",
+    "year": "2025",
+    "area": "FinTech, AI & Data",
+    "subarea": "FinTech & platforms",
+    "date": "2026-09-18",
+    "rq": "What role do open models play in the AI Economy?",
+    "finding": "1. Open models are underutilized by consumers compared to closed models.\n2. Quantify the economic value of underutilization, and 70% of the total market spending could be saved.",
+    "remember": "Openrouter, Measure of quantifying the economic scale of the closed model.",
+    "contribution": "marginal"
   }
 ]
