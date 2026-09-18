@@ -148,10 +148,10 @@
     "area": "Asset Pricing",
     "subarea": "Factor models",
     "date": "2026-09-18",
-    "rq": "",
-    "finding": "",
+    "rq": "Introduces the new five-factor model, adding factors such as profitability and investment.",
+    "finding": "The new five-factor model explains between 71% and 94% of the cross-section variance of expected returns for the Size, B/M, OP, and Inv porfolios they examine.",
     "remember": "",
-    "contribution": null
+    "contribution": "marginal"
   },
   {
     "id": "emu7g7gxj",
