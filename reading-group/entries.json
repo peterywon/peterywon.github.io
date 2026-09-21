@@ -200,5 +200,21 @@
     "finding": "",
     "remember": "",
     "contribution": null
+  },
+  {
+    "id": "emubr0mfl",
+    "ts": "2026-09-21T21:19:46.833Z",
+    "author": "Chunyuan",
+    "title": "Stock returns over the FOMC cycle",
+    "authors": "Cieslak, A., Morse, A. and Vissing‐Jorgensen, A",
+    "journal": "JF",
+    "year": "2018",
+    "area": "Asset Pricing",
+    "subarea": "Macro-finance",
+    "date": "2026-09-11",
+    "rq": "How does the Federal Reserve affect stock returns throughout the FOMC meeting cycle, beyond announcement days, and through what mechanism?",
+    "finding": "During 1994–2016, the entire average equity premium was earned in even weeks of the FOMC cycle—weeks 0, 2, 4, and 6, with week 0 beginning the day before the scheduled announcement. The evidence suggests that unexpectedly accommodative Fed",
+    "remember": "",
+    "contribution": "incremental"
   }
 ]
