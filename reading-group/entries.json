@@ -216,5 +216,21 @@
     "finding": "During 1994–2016, the entire average equity premium was earned in even weeks of the FOMC cycle—weeks 0, 2, 4, and 6, with week 0 beginning the day before the scheduled announcement. The evidence suggests that unexpectedly accommodative Fed",
     "remember": "",
     "contribution": "incremental"
+  },
+  {
+    "id": "emuhemovv",
+    "ts": "2026-09-25T20:19:38.491Z",
+    "author": "Peter",
+    "title": "Don't Dress Like Me: Value Implication of Trade Dress Protection",
+    "authors": "Hsu & Li",
+    "journal": "SSRN",
+    "year": "2026",
+    "area": "Corporate Finance",
+    "subarea": "Investment & financing",
+    "date": "2026-09-25",
+    "rq": "How does the protection of trade dress affect the value of firm?",
+    "finding": "1. Retail-reliant firm with weaker trademark portfolio experience higher stock valuation, higher MB, ROA, and operating performance.\n2. The effects are stronger in B2C, higher design intensity, and higher advertising expense area.",
+    "remember": "Indicator variable having comparison with their industry peer.",
+    "contribution": "marginal"
   }
 ]
