@@ -232,5 +232,21 @@
     "finding": "1. Retail-reliant firm with weaker trademark portfolio experience higher stock valuation, higher MB, ROA, and operating performance.\n2. The effects are stronger in B2C, higher design intensity, and higher advertising expense area.",
     "remember": "Indicator variable having comparison with their industry peer.",
     "contribution": "marginal"
+  },
+  {
+    "id": "emuhewobm",
+    "ts": "2026-09-25T20:27:24.323Z",
+    "author": "Young",
+    "title": "Stock Returns over the FOMC cycle",
+    "authors": "ANNA CIESLAK, ADAIR MORSE, and ANNETTE VISSING-JORGENSEN",
+    "journal": "JF",
+    "year": "2019",
+    "area": "Asset Pricing",
+    "subarea": "Return predictability",
+    "date": "2026-09-11",
+    "rq": "",
+    "finding": "",
+    "remember": "",
+    "contribution": null
   }
 ]
